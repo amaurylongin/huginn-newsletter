@@ -1,5 +1,0 @@
-# Destinataires de la newsletter HUGINN
-# Une adresse mail par ligne. Les lignes vides et celles commençant par # sont ignorées.
-# Pour ajouter/retirer un destinataire : éditez ce fichier et committez.
-
-arquus.osint@gmail.com
