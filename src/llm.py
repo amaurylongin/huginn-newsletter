@@ -100,16 +100,40 @@ def analyze_articles(raw_articles, criteria):
         "Produis le JSON final (schéma défini dans les instructions système)."
     )
 
-    response = client.models.generate_content(
-        model=MODEL_NAME,
-        contents=user_prompt,
-        config=types.GenerateContentConfig(
-            system_instruction=SYSTEM_PROMPT,
-            response_mime_type="application/json",
-            temperature=0.3,
-            max_output_tokens=8192,
-        ),
-    )
+  # Appel à Gemini avec retry automatique sur erreurs transitoires (503, 429, etc.)
+    import time
+    from google.genai import errors as genai_errors
+
+    max_retries = 4
+    delays = [15, 30, 60, 120]  # secondes d'attente entre chaque tentative
+    response = None
+    last_error = None
+
+    for attempt in range(max_retries):
+        try:
+            response = client.models.generate_content(
+                model=MODEL_NAME,
+                contents=user_prompt,
+                config=types.GenerateContentConfig(
+                    system_instruction=SYSTEM_PROMPT,
+                    response_mime_type="application/json",
+                    temperature=0.3,
+                    max_output_tokens=8192,
+                ),
+            )
+            break  # succès, on sort de la boucle
+        except genai_errors.ServerError as e:
+            last_error = e
+            if attempt < max_retries - 1:
+                wait = delays[attempt]
+                print(f"⚠ Gemini indisponible (tentative {attempt + 1}/{max_retries}) — nouvelle tentative dans {wait}s...")
+                time.sleep(wait)
+            else:
+                print(f"❌ Gemini toujours indisponible après {max_retries} tentatives.")
+                raise
+
+    if response is None:
+        raise RuntimeError(f"Impossible d'obtenir une réponse de Gemini : {last_error}")
 
     raw_text = response.text.strip()
     try:
