@@ -3,6 +3,7 @@
 Enchaîne : récupération RSS → analyse LLM → rendu HTML → envoi email → archivage.
 """
 import sys
+import os
 from pathlib import Path
 from datetime import datetime, timedelta, timezone
 
@@ -32,9 +33,12 @@ def main():
     print("HUGINN — Génération de la revue hebdomadaire")
     print("=" * 60)
 
-    # 1. Configuration
+# 1. Configuration
     sources = _load_lines(PROJECT_ROOT / "config" / "sources.txt")
-    recipients = _load_lines(PROJECT_ROOT / "config" / "recipients.txt")
+    # Destinataires : lus depuis la variable d'environnement RECIPIENTS (secret GitHub)
+    # Format attendu : liste d'emails séparés par des virgules
+    recipients_env = os.environ.get("RECIPIENTS", "")
+    recipients = [r.strip() for r in recipients_env.split(",") if r.strip()]
     criteria = (PROJECT_ROOT / "config" / "criteria.md").read_text(encoding="utf-8")
 
     print(f"\n▸ {len(sources)} source(s) RSS configurée(s)")
