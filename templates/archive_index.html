@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revue Huginn — Archives</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Work+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Work Sans', sans-serif;
+    background: #F7F2E9;
+    color: #0F1419;
+    min-height: 100vh;
+    padding: 60px 20px;
+  }
+  .container {
+    max-width: 780px;
+    margin: 0 auto;
+  }
+  .header {
+    background: #0F1419;
+    color: #F7F2E9;
+    padding: 48px 44px;
+    border-bottom: 4px solid #C2541E;
+    margin-bottom: 48px;
+  }
+  .brand {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 20px;
+    letter-spacing: 0.15em;
+    margin-bottom: 20px;
+  }
+  .brand .dot { color: #C2541E; }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-style: italic;
+    font-size: 56px;
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+  h1 em {
+    font-style: normal;
+    font-weight: 500;
+    color: #E8A87C;
+  }
+  .subtitle {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #E8A87C;
+    margin-top: 22px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(247,242,233,0.15);
+  }
+  .editions-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #C2541E;
+    margin-bottom: 22px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .editions-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #D9CFBD;
+  }
+  .edition {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 22px 0;
+    border-bottom: 1px dashed #D9CFBD;
+    text-decoration: none;
+    color: #0F1419;
+    transition: background 0.15s;
+  }
+  .edition:hover {
+    background: #EFE8DB;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+  .edition-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    color: #C2541E;
+    min-width: 70px;
+  }
+  .edition-title {
+    flex: 1;
+    font-family: 'Fraunces', serif;
+    font-size: 19px;
+    font-weight: 400;
+    font-style: italic;
+    color: #0F1419;
+    margin: 0 18px;
+  }
+  .edition-date {
+    font-family: 'Work Sans', sans-serif;
+    font-size: 13px;
+    color: #7A6F60;
+    white-space: nowrap;
+  }
+  .empty {
+    padding: 60px 0;
+    text-align: center;
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: #7A6F60;
+  }
+  .footer {
+    margin-top: 60px;
+    padding-top: 30px;
+    border-top: 1px solid #D9CFBD;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #7A6F60;
+    text-align: center;
+  }
+  @media (max-width: 640px) {
+    .header { padding: 32px 24px; }
+    h1 { font-size: 40px; }
+    .edition { flex-direction: column; align-items: flex-start; gap: 6px; }
+    .edition-title { margin: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header class="header">
+    <div class="brand"><span class="dot">◆</span>&nbsp; HUGINN</div>
+    <h1>Les <em>Archives</em><br>de la Revue Huginn</h1>
+    <p class="subtitle">Veille hebdomadaire ARQUUS · {{ editions|length }} édition{% if editions|length > 1 %}s{% endif %}</p>
+  </header>
+
+  <div class="editions-label">◆ Éditions publiées</div>
+
+  {% if editions %}
+    {% for e in editions %}
+    <a href="{{ e.url }}" class="edition">
+      <span class="edition-num">N°{{ e.number_padded }}</span>
+      <span class="edition-title">Revue Huginn</span>
+      <span class="edition-date">{{ e.date_label }}</span>
+    </a>
+    {% endfor %}
+  {% else %}
+    <div class="empty">Aucune édition publiée pour le moment.</div>
+  {% endif %}
+
+  <div class="footer">
+    Archives · HUGINN · Veille interne ARQUUS
+  </div>
+
+</div>
+
+</body>
+</html>
