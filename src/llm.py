@@ -1,6 +1,4 @@
 
-Copier
-
 """Analyse des articles via l'API Gemini (tier gratuit) — avec retry et fallback."""
 import os
 import json
