@@ -1,17 +1,17 @@
 """Rendu HTML de la newsletter et de la page d'archive via Jinja2."""
 import os
+import base64
 from pathlib import Path
 from collections import defaultdict
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-
 TEMPLATES_DIR = Path(__file__).parent.parent / "templates"
+ASSETS_DIR    = Path(__file__).parent.parent / "docs" / "assets"
 
 env = Environment(
     loader=FileSystemLoader(str(TEMPLATES_DIR)),
     autoescape=select_autoescape(["html"]),
 )
-
 
 THEMES_ORDER = [
     "Contrats & Industrie",
@@ -20,7 +20,6 @@ THEMES_ORDER = [
     "Géopolitique",
     "Conflits & Zones chaudes",
 ]
-
 
 FRENCH_MONTHS = [
     "", "janvier", "février", "mars", "avril", "mai", "juin",
@@ -36,9 +35,23 @@ def format_date_short(d):
     return f"{d.day} {FRENCH_MONTHS[d.month][:4]}."
 
 
+def _load_logo_b64(filename):
+    """Charge un logo depuis docs/assets/ et le retourne en data URI base64."""
+    path = ASSETS_DIR / filename
+    if not path.exists():
+        print(f"  ⚠ Logo introuvable : {path} — placeholder utilisé")
+        return ""
+    data = base64.b64encode(path.read_bytes()).decode("ascii")
+    ext = filename.rsplit(".", 1)[-1].lower()
+    mime = "image/png" if ext == "png" else f"image/{ext}"
+    return f"data:{mime};base64,{data}"
+
+
 def render_newsletter(articles, synthesis, barometer_text, barometer_level,
                       issue_number, start_date, end_date):
     """Rend le HTML de la newsletter."""
+
+    # Groupement par thème
     grouped = defaultdict(list)
     for article in articles:
         theme = article.get("theme", "Géopolitique")
@@ -55,7 +68,6 @@ def render_newsletter(articles, synthesis, barometer_text, barometer_level,
                 "count": len(grouped[theme]),
             })
             theme_num += 1
-    # Thèmes hors liste officielle (au cas où le LLM en invente un)
     for theme, arts in grouped.items():
         if theme not in THEMES_ORDER:
             themed_sections.append({
@@ -66,14 +78,16 @@ def render_newsletter(articles, synthesis, barometer_text, barometer_level,
             })
             theme_num += 1
 
-    gh_pages_url = os.environ.get("GH_PAGES_URL", "").rstrip("/")
+    gh_pages_url   = os.environ.get("GH_PAGES_URL", "").rstrip("/")
     feedback_email = os.environ.get("SMTP_USER", "arquus.osint@gmail.com")
-    # URL d'archive pour cette édition (GitHub Pages)
     archive_filename = f"{end_date.strftime('%Y-%m-%d')}-edition-{issue_number:03d}.html"
-    archive_url = (
-        f"{gh_pages_url}/editions/{archive_filename}" if gh_pages_url else "#"
-    )
+    archive_url      = f"{gh_pages_url}/editions/{archive_filename}" if gh_pages_url else "#"
     archive_index_url = f"{gh_pages_url}/" if gh_pages_url else "#"
+
+    # Logos en base64 — chargés depuis docs/assets/
+    huginn_b64      = _load_logo_b64("huginn-logo.png")
+    arquus_dark_b64 = _load_logo_b64("arquus-logo-dark.png")
+    arquus_white_b64 = _load_logo_b64("arquus-logo-white.png")
 
     template = env.get_template("newsletter.html")
     return template.render(
@@ -87,18 +101,20 @@ def render_newsletter(articles, synthesis, barometer_text, barometer_level,
         barometer_text=barometer_text,
         barometer_level=barometer_level,
         barometer_bars=[i < barometer_level for i in range(5)],
-        barometer_label=_barometer_label(barometer_level),
         total_articles=len(articles),
         themed_sections=themed_sections,
         gh_pages_url=gh_pages_url,
         feedback_email=feedback_email,
         archive_url=archive_url,
         archive_index_url=archive_index_url,
+        # Logos base64
+        huginn_b64=huginn_b64,
+        arquus_dark_b64=arquus_dark_b64,
+        arquus_white_b64=arquus_white_b64,
     )
 
 
 def render_archive_index(editions, gh_pages_url=""):
-    """Rend la page index de l'archive web."""
     template = env.get_template("archive_index.html")
     return template.render(
         editions=editions,
