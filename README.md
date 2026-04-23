@@ -1,6 +1,6 @@
 # 🐦‍⬛ HUGINN — Revue de veille ARQUUS
 
-Agent de veille OSINT automatisé qui collecte chaque semaine les articles pertinents de défense terrestre, les filtre et traduit via IA, puis envoie une newsletter par mail à une liste de destinataires. S'exécute sur GitHub Actions (100 % gratuit, ordi éteint OK).
+Agent de veille OSINT automatisé qui collecte chaque semaine les articles pertinents de défense terrestre, les filtre et traduit via IA, puis envoie une newsletter par mail à une liste de destinataires. S'exécute automatiquement via cron-job.org + GitHub Actions — ordi éteint, aucune action requise.
 
 ---
 
@@ -8,174 +8,177 @@ Agent de veille OSINT automatisé qui collecte chaque semaine les articles perti
 
 ```
 huginn-newsletter/
-├── .github/workflows/newsletter.yml    # Cron hebdomadaire (jour/heure à ajuster)
+├── .github/workflows/newsletter.yml    # Workflow GitHub Actions
 ├── src/
-│   ├── main.py                         # Orchestrateur
+│   ├── main.py                         # Orchestrateur principal
 │   ├── rss.py                          # Collecte des flux RSS
-│   ├── llm.py                          # Appels Gemini (filtrage + traduction)
+│   ├── llm.py                          # Filtrage et traduction via Gemini
 │   ├── renderer.py                     # Rendu HTML Jinja2
 │   ├── mailer.py                       # Envoi SMTP Gmail
 │   └── archiver.py                     # Archives GitHub Pages
 ├── templates/
-│   ├── newsletter.html                 # Template du mail (éditable)
-│   └── archive_index.html              # Template de la page d'archive
+│   ├── newsletter.html                 # Template du mail
+│   └── archive_index.html             # Template de la page d'archive
 ├── config/
 │   ├── sources.txt                     # 👉 Flux RSS (ligne = une URL)
-│   ├── recipients.txt                  # 👉 Destinataires (ligne = un mail)
+│   ├── recipients.txt                  # (vide — destinataires dans le secret RECIPIENTS)
 │   └── criteria.md                     # 👉 Critères de filtrage thématique
-├── assets/                             # 👉 Vos logos ici
-│   ├── huginn-logo.png                 #    (à déposer par vous)
-│   └── arquus-logo.png                 #    (à déposer par vous)
-├── docs/                               # Généré auto — GitHub Pages
-│   ├── index.html                      # Page d'archive
-│   ├── editions/                       # Archive des éditions
-│   └── assets/                         # Copie des logos pour GitHub Pages
+├── docs/
+│   ├── index.html                      # Page d'archive (GitHub Pages)
+│   ├── editions/                       # Éditions archivées
+│   └── assets/                         # Logos
 ├── requirements.txt
 └── README.md
 ```
 
 ---
 
+## ⚙️ Architecture
+
+```
+cron-job.org ──► GitHub Actions ──► RSS (12 sources)
+                      │                    │
+                      │              Gemini IA (filtrage + traduction FR)
+                      │                    │
+                      └──► Gmail SMTP ──► Destinataires
+                      └──► GitHub Pages ──► Archive web
+```
+
+**Coût total : 0 €** — tout repose sur des tiers gratuits.
+
+---
+
 ## 🚀 Installation pas-à-pas
 
-### Étape 1 — Créer le repo GitHub
+### Étape 1 — Cloner le repo
 
-1. Créez un nouveau repo **privé** sur GitHub (p. ex. `huginn-newsletter`).
-2. Clonez-le localement et copiez-y l'intégralité de ce projet.
-3. Committez et poussez :
-   ```bash
-   git add .
-   git commit -m "🎬 Initialisation HUGINN"
-   git push origin main
-   ```
+Utiliser GitHub Desktop : File → Clone repository, ou en ligne de commande :
+
+```bash
+git clone https://github.com/votre-username/huginn-newsletter.git
+```
 
 ### Étape 2 — Obtenir une clé API Gemini (gratuite)
 
-1. Allez sur https://aistudio.google.com/apikey
-2. Connectez-vous avec un compte Google (peut être `arquus.osint@gmail.com`).
-3. Cliquez sur **"Create API Key"** → **"Create API key in new project"**.
-4. **Copiez la clé** (elle commence par `AIza...`). Gardez-la pour l'étape 4.
-
-> **Limites du tier gratuit Gemini 2.5 Flash** : largement suffisantes pour 1 newsletter/semaine (plusieurs centaines de requêtes/jour autorisées).
+1. Aller sur **https://aistudio.google.com/apikey**
+2. Se connecter avec un compte Google
+3. Cliquer **"Create API Key"** → **"Create API key in new project"**
+4. Copier la clé (commence par `AIza...`)
 
 ### Étape 3 — Générer un mot de passe d'application Gmail
 
-1. Connectez-vous à `arquus.osint@gmail.com`.
-2. Activez la **validation en 2 étapes** (obligatoire) : https://myaccount.google.com/security → "Validation en 2 étapes".
-3. Une fois activée, allez sur https://myaccount.google.com/apppasswords.
-4. Créez un mot de passe d'application (sélectionnez "Autre" et nommez-le "HUGINN").
-5. **Copiez les 16 caractères** générés. Gardez-les pour l'étape 4.
+1. Se connecter au compte Gmail d'envoi
+2. Activer la **validation en 2 étapes** : https://myaccount.google.com/security
+3. Créer un mot de passe d'application : https://myaccount.google.com/apppasswords
+4. Nommer l'application `HUGINN` et copier les 16 caractères générés (sans les espaces)
 
 ### Étape 4 — Configurer les secrets GitHub
 
-Dans votre repo GitHub : **Settings → Secrets and variables → Actions**.
-
-**Onglet "Secrets"** — cliquez "New repository secret" et créez les trois suivants :
+Dans le repo : **Settings → Secrets and variables → Actions → Secrets**
 
 | Nom | Valeur |
 |---|---|
-| `GEMINI_API_KEY` | La clé récupérée à l'étape 2 |
-| `SMTP_USER` | `arquus.osint@gmail.com` |
-| `SMTP_PASSWORD` | Le mot de passe d'application à 16 caractères de l'étape 3 |
+| `GEMINI_API_KEY` | La clé Gemini (`AIza...`) |
+| `SMTP_USER` | Adresse Gmail d'envoi (ex: `votre.adresse@gmail.com`) |
+| `SMTP_PASSWORD` | Le mot de passe d'application de 16 caractères |
+| `RECIPIENTS` | Destinataires séparés par des virgules (ex: `prenom.nom@exemple.fr,contact@exemple.fr`) |
 
-**Onglet "Variables"** — cliquez "New repository variable" :
+Dans l'onglet **"Variables"** :
 
 | Nom | Valeur |
 |---|---|
-| `GH_PAGES_URL` | `https://VOTRE-USERNAME.github.io/huginn-newsletter` (remplacer par votre URL réelle après l'étape 6) |
+| `GH_PAGES_URL` | URL GitHub Pages sans slash final (ex: `https://votre-username.github.io/huginn-newsletter`) |
 
-### Étape 5 — Configurer les destinataires
+### Étape 5 — Activer GitHub Pages
 
-Éditez `config/recipients.txt` (dans votre repo, via l'interface web GitHub ou localement), ajoutez une adresse par ligne, puis committez.
+Dans le repo : **Settings → Pages**
+- Source : `Deploy from a branch`
+- Branch : `main` / Folder : `/docs`
+- Cliquer **Save**
 
-```
-# exemple
-arquus.osint@gmail.com
-jean.dupont@arquus.fr
-marie.martin@arquus.fr
-```
+### Étape 6 — Déposer les logos
 
-### Étape 6 — Activer GitHub Pages (pour les archives web)
+Placer les 3 fichiers dans `docs/assets/` du repo :
+- `huginn-logo.png`
+- `arquus-logo-dark.png`
+- `arquus-logo-white.png`
 
-Dans votre repo : **Settings → Pages** :
-- **Source** : "Deploy from a branch"
-- **Branch** : `main`
-- **Folder** : `/docs`
-- Cliquez **Save**.
+### Étape 7 — Autoriser les écritures du workflow
 
-GitHub Pages sera accessible à l'adresse `https://VOTRE-USERNAME.github.io/huginn-newsletter/`. Mettez cette URL dans la variable `GH_PAGES_URL` de l'étape 4.
+**Settings → Actions → General** → section "Workflow permissions" → cocher **"Read and write permissions"** → Save.
 
-### Étape 7 — Déposer les logos
+### Étape 8 — Configurer l'automatisation via cron-job.org
 
-Mettez vos deux logos dans le dossier `assets/` du repo :
-- `assets/huginn-logo.png` (idéalement 280px de large, fond transparent)
-- `assets/arquus-logo.png` (idéalement 200px de large, fond transparent)
+GitHub Actions n'est pas fiable pour les crons sur les repos peu actifs. On utilise **cron-job.org** (gratuit) pour déclencher le workflow à heure fixe.
 
-**Copiez-les aussi dans `docs/assets/`** (pour qu'ils soient servis par GitHub Pages) :
-```bash
-cp assets/*.png docs/assets/
-git add assets/ docs/assets/
-git commit -m "🎨 Ajout des logos"
-git push
-```
+#### 8.1 — Créer un Personal Access Token GitHub
 
-Ensuite, éditez `templates/newsletter.html` : deux emplacements sont commentés `<!-- Logo HUGINN : remplacez... -->`. Remplacez chaque balise `<span>` par la balise `<img>` indiquée juste à côté dans le commentaire.
+1. GitHub → avatar → **Settings → Developer settings → Personal access tokens → Tokens (classic)**
+2. **Generate new token (classic)**
+3. Nom : `HUGINN cron trigger` / Expiration : `No expiration`
+4. Cocher uniquement : **`workflow`**
+5. Copier le token (commence par `ghp_...`)
 
-### Étape 8 — Tester un premier envoi
+#### 8.2 — Créer le job sur cron-job.org
 
-Dans votre repo : **Actions → Revue Huginn → Run workflow → Run workflow**.
+1. Créer un compte sur **https://cron-job.org**
+2. Cliquer **"Create cronjob"** et remplir :
+   - **Title** : `HUGINN Newsletter`
+   - **URL** : `https://api.github.com/repos/VOTRE-USERNAME/huginn-newsletter/actions/workflows/newsletter.yml/dispatches`
+   - **Schedule** : choisir le jour et l'heure souhaités
+3. Onglet **"Advanced"** :
+   - **Request method** : `POST`
+   - **Request body** : `{"ref":"main"}`
+   - **Headers** → ajouter deux headers :
 
-Le job va :
-1. Récupérer les articles des 7 derniers jours depuis les 12 flux RSS
-2. Les envoyer à Gemini pour filtrage + traduction en français
-3. Générer la newsletter HTML
-4. L'envoyer à tous les destinataires
-5. Archiver l'édition sur GitHub Pages et committer la mise à jour
+| Name | Value |
+|---|---|
+| `Authorization` | `Bearer ghp_VOTRE_TOKEN` |
+| `Content-Type` | `application/json` |
 
-Surveillez les logs du workflow en direct. Si tout va bien, le mail arrive dans les boîtes et une nouvelle édition apparaît dans `docs/editions/`.
+4. Cliquer **"Create"** puis tester avec **"Run now"**
 
 ---
 
 ## ⚙️ Personnalisation courante
 
-### Modifier le jour / l'heure d'envoi
-
-Éditez `.github/workflows/newsletter.yml`, ligne `cron: "0 6 * * 1"` :
-
-| Souhait | Valeur cron (UTC) |
-|---|---|
-| Lundi 08h00 Paris (hiver) | `"0 7 * * 1"` |
-| Lundi 09h00 Paris | `"0 7 * * 1"` (hiver) / `"0 8 * * 1"` (été) |
-| Vendredi 18h00 Paris | `"0 16 * * 5"` (été) / `"0 17 * * 5"` (hiver) |
-
-Convertisseur : https://crontab.guru. ⚠ GitHub Actions utilise l'UTC, pas l'heure de Paris.
-
 ### Ajouter / retirer une source RSS
 
-Éditez `config/sources.txt`, ajoutez/supprimez des lignes, committez. Les lignes commençant par `#` sont ignorées.
+Éditer `config/sources.txt` (une URL par ligne, `#` pour commenter), commiter.
 
 ### Ajouter / retirer un destinataire
 
-Éditez `config/recipients.txt`, une adresse par ligne, committez.
+Mettre à jour le secret `RECIPIENTS` dans **Settings → Secrets and variables → Actions**.
+
+Format : `prenom.nom@exemple.fr,contact@exemple.fr,autre@exemple.fr`
+
+### Modifier le jour / l'heure d'envoi
+
+Modifier le planning directement sur **cron-job.org** dans les paramètres du job HUGINN.
+
+> ⚠️ Les heures sur cron-job.org sont en UTC.
+> Paris = UTC+2 en été (mars→octobre), UTC+1 en hiver (octobre→mars).
+> Exemple : lundi 08h00 Paris en été = lundi **06h00 UTC**.
 
 ### Ajuster les critères de filtrage
 
-Éditez `config/criteria.md`. Vous pouvez ajouter de nouveaux mots-clés, affiner les exclusions, ajouter ou retirer des thèmes (si vous retirez un thème, pensez aussi à l'enlever de la liste `THEMES_ORDER` dans `src/renderer.py` et de la liste autorisée dans `src/llm.py`).
+Éditer `config/criteria.md` — ajouter des mots-clés, affiner les exclusions, modifier les thèmes.
 
-### Relancer manuellement un envoi
+### Relancer manuellement
 
-**Actions → Revue Huginn → Run workflow**.
+Dans GitHub : **Actions → Revue Huginn → Run workflow → Run workflow**.
 
 ---
 
-## 🧪 Tester en local (facultatif, pour debug)
+## 🧪 Tester en local (facultatif)
 
 ```bash
 pip install -r requirements.txt
 
 export GEMINI_API_KEY="AIza..."
-export SMTP_USER="arquus.osint@gmail.com"
-export SMTP_PASSWORD="xxxx xxxx xxxx xxxx"
+export SMTP_USER="votre.adresse@gmail.com"
+export SMTP_PASSWORD="xxxxxxxxxxxxxxxx"
+export RECIPIENTS="prenom.nom@exemple.fr,contact@exemple.fr"
 export GH_PAGES_URL="https://votre-username.github.io/huginn-newsletter"
 
 python src/main.py
@@ -187,21 +190,24 @@ python src/main.py
 
 | Problème | Cause probable | Solution |
 |---|---|---|
-| "SMTP authentication failed" | Mot de passe d'application invalide ou double authentification non activée | Vérifier l'étape 3 |
+| Workflow ne se déclenche pas automatiquement | GitHub Actions peu fiable sur crons | Utiliser cron-job.org (étape 8) |
+| "SMTP authentication failed" | Mot de passe d'application invalide | Regénérer un mot de passe sur myaccount.google.com/apppasswords |
 | "GEMINI_API_KEY not set" | Secret absent ou mal nommé | Vérifier l'étape 4 |
-| "Moins de 2 articles retenus" | Semaine creuse ou critères trop stricts | Normal si la semaine est calme ; sinon assouplir `config/criteria.md` |
-| Mail reçu sans les logos | Fichiers non copiés dans `docs/assets/` | Voir étape 7 |
-| GitHub Pages 404 | Pages non activé ou URL non à jour | Vérifier étape 6 et la variable `GH_PAGES_URL` |
-| Workflow se déclenche mais ne pousse pas l'archive | Permissions insuffisantes | Settings → Actions → General → Workflow permissions = "Read and write permissions" |
+| Moins de 2 articles retenus | Semaine creuse ou critères trop stricts | Assouplir `config/criteria.md` |
+| Tous les articles viennent d'une seule source | Autres sources bloquent les requêtes | Mettre à jour `config/sources.txt` |
+| Logos absents dans le mail | Fichiers manquants dans `docs/assets/` | Vérifier l'étape 6 |
+| GitHub Pages 404 | Pages non activé ou URL incorrecte | Vérifier étape 5 et la variable `GH_PAGES_URL` |
+| Workflow ne peut pas commiter l'archive | Permissions insuffisantes | Settings → Actions → General → "Read and write permissions" |
+| Couleurs incorrectes dans Outlook | Mode sombre Outlook actif | Fichier → Options → Général → cocher "Ne jamais modifier la couleur des messages" |
 
 ---
 
-## 📜 À savoir
+## 📜 Notes
 
-- Le filtrage est fait par IA — des faux positifs/négatifs sont possibles. Utilisez les boutons 👍 / 👎 en bas de la newsletter pour ajuster progressivement les critères.
-- L'API Gemini est gratuite dans les limites du tier gratuit (très généreux pour ce cas d'usage).
-- GitHub Actions offre 2 000 minutes/mois gratuites sur repo privé — largement plus qu'il n'en faut.
-- Toutes les archives restent disponibles indéfiniment via GitHub Pages.
+- Le filtrage est réalisé par IA — des faux positifs/négatifs sont possibles. Les boutons 👍 / 👎 en bas de chaque newsletter permettent de signaler les problèmes.
+- L'API Gemini est utilisée sur le tier gratuit (suffisant pour 1 newsletter/semaine).
+- GitHub Actions offre 2 000 minutes/mois gratuites — largement suffisant.
+- Toutes les archives sont disponibles indéfiniment via GitHub Pages.
 
 ---
 
