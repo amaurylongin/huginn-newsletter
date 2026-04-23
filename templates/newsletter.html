@@ -6,64 +6,60 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <title>Revue Huginn N°{{ issue_number_padded }}</title>
 </head>
-<body style="margin:0;padding:0;background:#1A1A1A;font-family:Arial,Helvetica,sans-serif;font-weight:bold;">
+<body style="margin:0;padding:0;background:#F4F4F4;font-family:Arial,Helvetica,sans-serif;font-weight:bold;" bgcolor="#F4F4F4">
 
 <!-- Pré-header invisible -->
-<div style="display:none;max-height:0;overflow:hidden;font-size:1px;color:#1A1A1A;">
+<div style="display:none;max-height:0;overflow:hidden;font-size:1px;color:#F4F4F4;">
   Huginn N°{{ issue_number_padded }} · {{ total_articles }} article{% if total_articles > 1 %}s{% endif %} · {{ start_date_short }} → {{ end_date_short }}
 </div>
 
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#1A1A1A;">
-<tr><td align="center" style="padding:40px 12px;">
+<!-- Wrapper externe -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#F4F4F4" style="background:#F4F4F4;">
+<tr><td align="center" style="padding:30px 12px;">
 
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:680px;background:#FFFFFF;">
+<!-- Conteneur principal 680px -->
+<table role="presentation" width="680" cellpadding="0" cellspacing="0" border="0" bgcolor="#FFFFFF" style="background:#FFFFFF;max-width:680px;width:100%;">
 
   <!-- ===== MASTHEAD fond sage ===== -->
   <tr>
-    <td style="background:#D9E8D6;padding:22px 36px 20px;border-bottom:3px solid #333F48;">
+    <td bgcolor="#D9E8D6" style="background:#D9E8D6;padding:22px 36px 20px;border-bottom:3px solid #333F48;">
 
-      <!-- Logos : ARQUUS | HUGINN titre | corbeau -->
+      <!-- Ligne logos -->
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
         <tr>
-          <td style="padding-bottom:14px;border-bottom:1px solid rgba(51,63,72,0.22);">
+          <td style="padding-bottom:14px;border-bottom:1px solid #B8CDB3;">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
               <tr>
                 <!-- Logo ARQUUS gauche -->
                 <td width="33%" align="left" valign="middle">
                   {% if arquus_dark_b64 %}
-                  <img src="{{ arquus_dark_b64 }}" width="80" alt="ARQUUS" style="width:80px;height:auto;display:block;">
+                  <img src="{{ arquus_dark_b64 }}" width="80" alt="ARQUUS" style="width:80px;height:auto;display:block;border:0;">
                   {% else %}
                   <span style="font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:14px;color:#333F48;letter-spacing:3px;">ARQUUS</span>
                   {% endif %}
                 </td>
-                <!-- Titre HUGINN centré -->
+                <!-- Titre HUGINN -->
                 <td width="34%" align="center" valign="middle">
-                  <span style="font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:46px;letter-spacing:12px;text-transform:uppercase;color:#333F48;line-height:1;display:block;text-align:center;padding-left:12px;">Huginn</span>
+                  <span style="font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:42px;letter-spacing:10px;text-transform:uppercase;color:#333F48;line-height:1;display:block;text-align:center;padding-left:10px;">Huginn</span>
                 </td>
-                <!-- Logo corbeau droit -->
+                <!-- Logo corbeau droite -->
                 <td width="33%" align="right" valign="middle">
                   {% if huginn_b64 %}
-                  <img src="{{ huginn_b64 }}" width="120" alt="HUGINN" style="width:120px;height:auto;display:block;margin-left:auto;margin-right:-14px;">
+                  <img src="{{ huginn_b64 }}" width="115" alt="HUGINN" style="width:115px;height:auto;display:block;margin-left:auto;border:0;">
                   {% endif %}
                 </td>
               </tr>
             </table>
           </td>
         </tr>
-        <!-- Ligne basse : n° | tagline | dates -->
+        <!-- Méta -->
         <tr>
-          <td style="padding-top:14px;">
+          <td style="padding-top:12px;">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
               <tr>
-                <td align="left">
-                  <span style="font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#333F48;">◆ N°{{ issue_number_padded }}</span>
-                </td>
-                <td align="center">
-                  <span style="font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#333F48;">Revue de veille défense · ARQUUS</span>
-                </td>
-                <td align="right">
-                  <span style="font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#333F48;">{{ start_date_label }} → {{ end_date_label }}</span>
-                </td>
+                <td align="left" style="font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#333F48;">◆ N°{{ issue_number_padded }}</td>
+                <td align="center" style="font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#333F48;">Revue de veille défense · ARQUUS</td>
+                <td align="right" style="font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#333F48;">{{ start_date_label }} → {{ end_date_label }}</td>
               </tr>
             </table>
           </td>
@@ -73,39 +69,39 @@
     </td>
   </tr>
 
-  <!-- ===== SYNTHÈSE ===== -->
+  <!-- ===== SYNTHÈSE fond blanc ===== -->
   <tr>
-    <td style="padding:40px 44px 34px;background:#FFFFFF;border-bottom:1px solid #E0DED7;">
+    <td bgcolor="#FFFFFF" style="background:#FFFFFF;padding:40px 44px 34px;border-bottom:1px solid #E0DED7;">
+      <!-- Label -->
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:16px;">
         <tr>
           <td style="white-space:nowrap;vertical-align:middle;padding-right:14px;">
             <table role="presentation" cellpadding="0" cellspacing="0" border="0">
               <tr>
-                <td style="width:10px;height:10px;background:#D9E8D6;border:1.5px solid #333F48;">&nbsp;</td>
-                <td style="padding-left:12px;white-space:nowrap;">
+                <td bgcolor="#D9E8D6" width="10" height="10" style="background:#D9E8D6;border:1.5px solid #333F48;width:10px;height:10px;">&nbsp;</td>
+                <td style="padding-left:10px;white-space:nowrap;">
                   <span style="font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#333F48;">Synthèse de la semaine</span>
                 </td>
               </tr>
             </table>
           </td>
-          <td width="100%" style="border-bottom:1px solid #E0DED7;">&nbsp;</td>
+          <td width="100%" bgcolor="#E0DED7" height="1" style="background:#E0DED7;height:1px;font-size:1px;line-height:1px;">&nbsp;</td>
         </tr>
       </table>
       <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:16px;line-height:1.6;color:#000000;">{{ synthesis }}</p>
     </td>
   </tr>
 
-  <!-- ===== THÈMES ===== -->
+  <!-- ===== THÈMES fond blanc ===== -->
   {% for section in themed_sections %}
   <tr>
-    <td style="padding:34px 44px 28px;{% if not loop.first %}border-top:1px solid #E0DED7;{% endif %}background:#FFFFFF;">
+    <td bgcolor="#FFFFFF" style="background:#FFFFFF;padding:34px 44px 28px;{% if not loop.first %}border-top:1px solid #E0DED7;{% endif %}">
 
       <!-- En-tête thème -->
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:26px;">
         <tr>
-          <td style="border-left:4px solid #D9E8D6;padding-left:14px;vertical-align:middle;">
-            <span style="font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:11px;color:#333F48;letter-spacing:1px;">{{ "%02d"|format(section.number) }} /&nbsp;</span>
-            <span style="font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:20px;color:#000000;text-transform:uppercase;letter-spacing:1px;">{{ section.title }}</span>
+          <td style="padding-left:14px;border-left:4px solid #D9E8D6;vertical-align:middle;">
+            <span style="font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:11px;color:#333F48;letter-spacing:1px;">{{ "%02d"|format(section.number) }} /&nbsp;</span><span style="font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:20px;color:#000000;text-transform:uppercase;letter-spacing:1px;">{{ section.title }}</span>
           </td>
           <td align="right" style="vertical-align:middle;white-space:nowrap;">
             <span style="font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:10px;color:#6B7178;letter-spacing:2px;text-transform:uppercase;">{{ section.count }} article{% if section.count > 1 %}s{% endif %}</span>
@@ -115,46 +111,44 @@
 
       <!-- Articles -->
       {% for article in section.articles %}
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:{% if not loop.last %}30px{% else %}0px{% endif %};">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="{% if not loop.last %}margin-bottom:30px;{% endif %}">
         <tr>
           <td style="{% if not loop.last %}padding-bottom:28px;border-bottom:1px dashed #E0DED7;{% endif %}">
 
-            <!-- Méta -->
+            <!-- Méta source · date -->
             <p style="margin:0 0 10px 0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#6B7178;">
               <span style="color:#333F48;">{{ article.source }}</span>&nbsp;·&nbsp;{{ article.date[:10] }}
             </p>
 
-            <!-- Titre -->
-            <p style="margin:0 0 14px 0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:{% if loop.first and section.number == 1 %}26px{% else %}22px{% endif %};line-height:1.25;color:#000000;">
+            <!-- Titre article -->
+            <p style="margin:0 0 14px 0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;line-height:1.25;color:#000000;font-size:{% if loop.first and section.number == 1 %}26px{% else %}22px{% endif %};">
               {{ article.title_fr }}
             </p>
 
-            <!-- Image -->
+            <!-- Image si disponible -->
             {% if article.image_url %}
-            <img src="{{ article.image_url }}" width="592" alt="" style="width:100%;max-width:592px;height:auto;display:block;margin-bottom:16px;">
+            <img src="{{ article.image_url }}" width="592" alt="" style="width:100%;max-width:592px;height:auto;display:block;margin-bottom:16px;border:0;">
             {% endif %}
 
             <!-- Résumé -->
             <p style="margin:0 0 16px 0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:14px;line-height:1.65;color:#000000;">{{ article.summary_fr }}</p>
 
-            <!-- Quote -->
+            <!-- Citation -->
             {% if article.quote %}
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:18px 0;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:16px 0;">
               <tr>
-                <td style="border-left:4px solid #D9E8D6;padding:6px 0 6px 18px;">
+                <td style="border-left:4px solid #D9E8D6;padding:4px 0 4px 18px;">
                   <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-style:italic;font-size:15px;line-height:1.45;color:#333F48;">«&nbsp;{{ article.quote }}&nbsp;»</p>
                 </td>
               </tr>
             </table>
             {% endif %}
 
-            <!-- Lien -->
-            <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:4px;">
+            <!-- Bouton lire -->
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-top:6px;">
               <tr>
                 <td style="border:2px solid #333F48;">
-                  <a href="{{ article.link }}" style="display:inline-block;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#333F48;text-decoration:none;padding:10px 22px;">
-                    Lire l'article →
-                  </a>
+                  <a href="{{ article.link }}" style="display:inline-block;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#333F48;text-decoration:none;padding:10px 20px;">Lire l'article →</a>
                 </td>
               </tr>
             </table>
@@ -170,60 +164,48 @@
 
   <!-- ===== FEEDBACK fond noir ===== -->
   <tr>
-    <td style="background:#000000;padding:36px 44px;text-align:center;">
-      <p style="margin:0 0 14px 0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#D9E8D6;">◆ Votre avis compte</p>
-      <p style="margin:0 0 24px 0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:18px;color:#FFFFFF;">Cette édition vous a-t-elle été utile&nbsp;?</p>
-      <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto 26px auto;">
+    <td bgcolor="#000000" style="background:#000000;padding:36px 44px;text-align:center;">
+      <p style="margin:0 0 12px 0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#D9E8D6;">◆ Votre avis compte</p>
+      <p style="margin:0 0 22px 0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:18px;color:#FFFFFF;">Cette édition vous a-t-elle été utile&nbsp;?</p>
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto 24px auto;">
         <tr>
-          <td style="padding-right:6px;">
-            <a href="mailto:{{ feedback_email }}?subject=Feedback%20positif%20—%20Huginn%20N°{{ issue_number_padded }}"
-               style="display:inline-block;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#FFFFFF;text-decoration:none;padding:12px 22px;border:2px solid #D9E8D6;">
-              👍 Pertinente
-            </a>
+          <td style="padding-right:8px;">
+            <a href="mailto:{{ feedback_email }}?subject=Feedback%20positif%20—%20Huginn%20N%C2%B0{{ issue_number_padded }}" style="display:inline-block;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#FFFFFF;text-decoration:none;padding:11px 20px;border:2px solid #D9E8D6;">👍 Pertinente</a>
           </td>
-          <td style="padding-left:6px;">
-            <a href="mailto:{{ feedback_email }}?subject=Feedback%20à%20améliorer%20—%20Huginn%20N°{{ issue_number_padded }}"
-               style="display:inline-block;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#FFFFFF;text-decoration:none;padding:12px 22px;border:2px solid #D9E8D6;">
-              👎 À améliorer
-            </a>
+          <td style="padding-left:8px;">
+            <a href="mailto:{{ feedback_email }}?subject=Feedback%20à%20améliorer%20—%20Huginn%20N%C2%B0{{ issue_number_padded }}" style="display:inline-block;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#FFFFFF;text-decoration:none;padding:11px 20px;border:2px solid #D9E8D6;">👎 À améliorer</a>
           </td>
         </tr>
       </table>
-      <a href="{{ archive_index_url }}" style="font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#D9E8D6;text-decoration:none;display:block;padding-top:20px;border-top:1px solid #1F1F1F;">
-        ◆ Consulter toutes les éditions archivées →
-      </a>
+      <a href="{{ archive_index_url }}" style="font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#D9E8D6;text-decoration:none;">◆ Consulter toutes les éditions archivées →</a>
     </td>
   </tr>
 
   <!-- ===== FOOTER fond charcoal ===== -->
   <tr>
-    <td style="background:#333F48;padding:38px 44px 40px;border-top:3px solid #D9E8D6;text-align:center;">
+    <td bgcolor="#333F48" style="background:#333F48;padding:36px 44px 40px;border-top:3px solid #D9E8D6;text-align:center;">
 
       {% if arquus_white_b64 %}
-      <img src="{{ arquus_white_b64 }}" width="130" alt="ARQUUS" style="width:130px;height:auto;display:block;margin:0 auto 22px auto;">
+      <img src="{{ arquus_white_b64 }}" width="120" alt="ARQUUS" style="width:120px;height:auto;display:block;margin:0 auto 20px auto;border:0;">
       {% endif %}
 
-      <p style="margin:0 0 14px 0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#D9E8D6;">
-        Huginn — La pensée qui survole le monde
-      </p>
+      <p style="margin:0 0 12px 0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#D9E8D6;">Huginn — La pensée qui survole le monde</p>
 
-      <p style="margin:0 auto 22px auto;max-width:480px;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:12px;line-height:1.7;color:#FFFFFF;">
-        Dans la mythologie nordique, Huginn est l'un des deux corbeaux d'Odin : il parcourt chaque jour les neuf mondes pour lui rapporter ce qu'il voit. Dans un contexte géopolitique où l'information terrestre devient une ressource stratégique, cet agent veille pour ARQUUS — filtre, trie, et délivre chaque semaine l'essentiel.
-      </p>
+      <p style="margin:0 auto 20px auto;max-width:480px;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:12px;line-height:1.7;color:#FFFFFF;">Dans la mythologie nordique, Huginn est l'un des deux corbeaux d'Odin : il parcourt chaque jour les neuf mondes pour lui rapporter ce qu'il voit. Dans un contexte géopolitique où l'information terrestre devient une ressource stratégique, cet agent veille pour ARQUUS — filtre, trie, et délivre chaque semaine l'essentiel.</p>
 
-      <p style="margin:0;padding-top:20px;border-top:1px solid #2A3440;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#D9E8D6;">
-        Revue Huginn · Veille interne ARQUUS · {{ feedback_email }}
-      </p>
+      <p style="margin:0;padding-top:18px;border-top:1px solid #2A3440;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#D9E8D6;">Revue Huginn · Veille interne ARQUUS · {{ feedback_email }}</p>
 
-      <p style="margin:14px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-weight:normal;font-style:italic;font-size:10px;line-height:1.5;color:#7A8A94;">
-        ⚠ Cette revue est générée automatiquement par une intelligence artificielle à partir de flux RSS publics. Elle peut contenir des erreurs, des traductions imparfaites ou des omissions. Vérifiez toujours les informations critiques en consultant les articles originaux.
-      </p>
+      <p style="margin:12px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-weight:normal;font-style:italic;font-size:10px;line-height:1.5;color:#7A8A94;">⚠ Cette revue est générée automatiquement par une intelligence artificielle. Elle peut contenir des erreurs, des traductions imparfaites ou des omissions. Vérifiez toujours les informations critiques en consultant les articles originaux.</p>
 
     </td>
   </tr>
 
 </table>
+<!-- /conteneur -->
+
 </td></tr>
 </table>
+<!-- /wrapper -->
+
 </body>
 </html>
