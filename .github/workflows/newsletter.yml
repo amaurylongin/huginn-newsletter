@@ -17,8 +17,7 @@ on:
   #
   # Convertisseur : https://crontab.guru
   # ============================================================
-  schedule:
-    - cron: "33 9 * * 4"
+
 
   # Permet aussi un déclenchement manuel depuis l'onglet "Actions"
   workflow_dispatch:
