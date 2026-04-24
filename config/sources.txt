@@ -1,16 +1,27 @@
 # Sources RSS HUGINN
 # Une URL par ligne. Les lignes vides et celles commençant par # sont ignorées.
 # Pour ajouter/retirer une source : éditez ce fichier et committez.
+# Sources RSS HUGINN — mises à jour avril 2026
+# Une URL par ligne. Lignes vides et # ignorées.
 
-https://kyivindependent.com/feed/
-https://www.ukrinform.net/rss/block-ato.xml
-https://militarnyi.com/en/feed/
-https://www.thedefensepost.com/feed/
-https://defense-update.com/feed
-https://bulgarianmilitary.com/feed/
-https://www.armyrecognition.com/news/army-news/feed/rss
-https://army-technology.com/feed
+# === DÉFENSE GÉNÉRALE ===
+https://breakingdefense.com/feed/
+https://www.defensenews.com/arc/outboundfeeds/rss/
+https://militaryleak.com/feed/
+https://quwa.org/feed/
+
+# === CONFLIT UKRAINIEN ===
+https://kyivindependent.com/tag/war/feed/
+https://euromaidanpress.com/feed/
+
+# === TECHNOLOGIE & ARMEMENTS ===
+https://army-technology.com/feed/
 https://mwi.westpoint.edu/feed/
-https://www.jpost.com/rss/rssfeedsmilitary.aspx
-https://united24media.com/feed/
-https://euromaidan.press/feed/
+https://www.armyrecognition.com/feed/rss.xml
+
+# === MOYEN-ORIENT / CONFLITS ===
+https://www.jpost.com/Israel-News/feed
+
+# === INDUSTRIE ===
+https://www.defenseindustrydaily.com/feed/
+https://www.shephard.co.uk/news/land-warfare/rss/
