@@ -42,10 +42,6 @@
 
   <!-- ===== THÈMES ===== -->
   {% for section in themed_sections %}
-
-  {% set with_img = section.articles | selectattr("image_url") | list %}
-  {% set no_img   = section.articles | rejectattr("image_url") | list %}
-
   <tr>
     <td bgcolor="#FFFFFF" style="background-color:#FFFFFF;padding:24px 32px 20px;{% if not loop.first %}border-top:2px solid #E0DED7;{% endif %}">
 
@@ -59,15 +55,14 @@
         </tr>
       </table>
 
-      <!-- Articles AVEC photo : grille 2 colonnes -->
-      {% if with_img %}
-      {% for i in range(0, with_img|length, 2) %}
-      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:{% if i + 2 < with_img|length or no_img %}18px{% else %}0{% endif %};">
+      <!-- Grille 2 colonnes — tous les articles ont une image garantie -->
+      {% for i in range(0, section.articles|length, 2) %}
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:{% if i + 2 < section.articles|length %}18px{% else %}0{% endif %};">
         <tr valign="top">
 
           <!-- Article gauche -->
           <td width="49%" style="padding-right:6px;">
-            {% set a = with_img[i] %}
+            {% set a = section.articles[i] %}
             <a href="{{ a.link }}" style="text-decoration:none;display:block;color:#000000;">
               <img src="{{ a.image_url }}" width="308" alt="" style="display:block;width:100%;height:175px;object-fit:cover;border:0;margin-bottom:8px;">
               <p style="margin:0 0 5px 0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#6B7178;">{{ a.source }} · {{ a.date[:10] }}</p>
@@ -80,13 +75,13 @@
             </table>
           </td>
 
-          <!-- Séparateur -->
+          <!-- Séparateur vertical -->
           <td width="2%" bgcolor="#E0DED7" style="background-color:#E0DED7;width:1px;">&nbsp;</td>
 
           <!-- Article droit -->
           <td width="49%" style="padding-left:6px;">
-            {% if i+1 < with_img|length %}
-            {% set b = with_img[i+1] %}
+            {% if i+1 < section.articles|length %}
+            {% set b = section.articles[i+1] %}
             <a href="{{ b.link }}" style="text-decoration:none;display:block;color:#000000;">
               <img src="{{ b.image_url }}" width="308" alt="" style="display:block;width:100%;height:175px;object-fit:cover;border:0;margin-bottom:8px;">
               <p style="margin:0 0 5px 0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#6B7178;">{{ b.source }} · {{ b.date[:10] }}</p>
@@ -102,39 +97,12 @@
 
         </tr>
       </table>
-      {% endfor %}
-      {% endif %}
-
-      <!-- Articles SANS photo : liste compacte séparée -->
-      {% if no_img %}
-      {% if with_img %}
-      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:10px;">
-        <tr><td bgcolor="#E0DED7" height="1" style="background-color:#E0DED7;font-size:0;line-height:0;">&nbsp;</td></tr>
-      </table>
-      {% endif %}
-      {% for a in no_img %}
-      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:{% if not loop.last %}12px{% else %}0{% endif %};">
-        <tr valign="middle">
-          <!-- Trait vertical coloré -->
-          <td width="3" bgcolor="#D9E8D6" style="background-color:#D9E8D6;width:3px;">&nbsp;</td>
-          <td style="padding:8px 0 8px 14px;">
-            <p style="margin:0 0 3px 0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#6B7178;">{{ a.source }} · {{ a.date[:10] }}</p>
-            <p style="margin:0 0 8px 0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:15px;line-height:1.3;color:#000000;">{{ a.title_fr }}</p>
-            <table cellpadding="0" cellspacing="0" border="0">
-              <tr><td style="border:1.5px solid #333F48;">
-                <a href="{{ a.link }}" style="display:inline-block;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#333F48;text-decoration:none;padding:6px 12px;">Lire →</a>
-              </td></tr>
-            </table>
-          </td>
-        </tr>
-      </table>
-      {% if not loop.last %}
-      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+      {% if i + 2 < section.articles|length %}
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:18px;">
         <tr><td bgcolor="#E0DED7" height="1" style="background-color:#E0DED7;font-size:0;line-height:0;">&nbsp;</td></tr>
       </table>
       {% endif %}
       {% endfor %}
-      {% endif %}
 
     </td>
   </tr>
