@@ -40,29 +40,17 @@
   </tr>
   <tr><td bgcolor="#333F48" height="3" style="background-color:#333F48;font-size:0;line-height:0;">&nbsp;</td></tr>
 
-  <!-- ===== THÈMES ===== -->
-  {% for section in themed_sections %}
+  <!-- ===== GRILLE ARTICLES (liste plate, 2 colonnes) ===== -->
   <tr>
-    <td bgcolor="#FFFFFF" style="background-color:#FFFFFF;padding:24px 32px 20px;{% if not loop.first %}border-top:2px solid #E0DED7;{% endif %}">
+    <td bgcolor="#FFFFFF" style="background-color:#FFFFFF;padding:24px 32px 20px;">
 
-      <!-- En-tête thème -->
-      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:18px;">
-        <tr>
-          <td width="4" bgcolor="#D9E8D6" style="background-color:#D9E8D6;width:4px;">&nbsp;</td>
-          <td style="padding-left:12px;">
-            <span style="font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:11px;color:#333F48;letter-spacing:1px;">{{ "%02d"|format(section.number) }} /&nbsp;&nbsp;</span><span style="font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:18px;color:#000000;text-transform:uppercase;">{{ section.title }}</span>
-          </td>
-        </tr>
-      </table>
-
-      <!-- Grille 2 colonnes — tous les articles ont une image garantie -->
-      {% for i in range(0, section.articles|length, 2) %}
-      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:{% if i + 2 < section.articles|length %}18px{% else %}0{% endif %};">
+      {% for i in range(0, articles|length, 2) %}
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:{% if i + 2 < articles|length %}18px{% else %}0{% endif %};">
         <tr valign="top">
 
           <!-- Article gauche -->
           <td width="49%" style="padding-right:6px;">
-            {% set a = section.articles[i] %}
+            {% set a = articles[i] %}
             <a href="{{ a.link }}" style="text-decoration:none;display:block;color:#000000;">
               <img src="{{ a.image_url }}" width="308" alt="" style="display:block;width:100%;height:175px;object-fit:cover;border:0;margin-bottom:8px;">
               <p style="margin:0 0 5px 0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#6B7178;">{{ a.source }} · {{ a.date[:10] }}</p>
@@ -75,13 +63,13 @@
             </table>
           </td>
 
-          <!-- Séparateur vertical -->
+          <!-- Séparateur -->
           <td width="2%" bgcolor="#E0DED7" style="background-color:#E0DED7;width:1px;">&nbsp;</td>
 
           <!-- Article droit -->
           <td width="49%" style="padding-left:6px;">
-            {% if i+1 < section.articles|length %}
-            {% set b = section.articles[i+1] %}
+            {% if i+1 < articles|length %}
+            {% set b = articles[i+1] %}
             <a href="{{ b.link }}" style="text-decoration:none;display:block;color:#000000;">
               <img src="{{ b.image_url }}" width="308" alt="" style="display:block;width:100%;height:175px;object-fit:cover;border:0;margin-bottom:8px;">
               <p style="margin:0 0 5px 0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#6B7178;">{{ b.source }} · {{ b.date[:10] }}</p>
@@ -97,7 +85,8 @@
 
         </tr>
       </table>
-      {% if i + 2 < section.articles|length %}
+
+      {% if i + 2 < articles|length %}
       <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:18px;">
         <tr><td bgcolor="#E0DED7" height="1" style="background-color:#E0DED7;font-size:0;line-height:0;">&nbsp;</td></tr>
       </table>
@@ -106,38 +95,48 @@
 
     </td>
   </tr>
-  {% endfor %}
 
-  <!-- ===== FEEDBACK ===== -->
+  <!-- ===== ARCHIVE (mis en valeur) ===== -->
+  <tr><td bgcolor="#333F48" height="2" style="background-color:#333F48;font-size:0;line-height:0;">&nbsp;</td></tr>
   <tr>
-    <td bgcolor="#000000" style="background-color:#000000;padding:28px 32px;text-align:center;">
-      <p style="margin:0 0 12px 0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#D9E8D6;">◆ Votre avis compte</p>
-      <p style="margin:0 0 20px 0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:16px;color:#FFFFFF;">Cette édition vous a-t-elle été utile&nbsp;?</p>
-      <table cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto 22px auto;">
+    <td bgcolor="#D9E8D6" style="background-color:#D9E8D6;padding:20px 32px;text-align:center;">
+      <p style="margin:0 0 12px 0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#333F48;">◆ Toutes les éditions passées</p>
+      <table cellpadding="0" cellspacing="0" border="0" align="center">
         <tr>
-          <td style="padding-right:6px;">
-            <a href="mailto:{{ feedback_email }}?subject=Feedback%20positif%20Huginn%20N°{{ issue_number_padded }}" style="display:inline-block;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#FFFFFF;text-decoration:none;padding:10px 20px;border:2px solid #D9E8D6;">👍 Pertinente</a>
-          </td>
-          <td style="padding-left:6px;">
-            <a href="mailto:{{ feedback_email }}?subject=Feedback%20ameliorer%20Huginn%20N°{{ issue_number_padded }}" style="display:inline-block;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#FFFFFF;text-decoration:none;padding:10px 20px;border:2px solid #D9E8D6;">👎 À améliorer</a>
+          <td bgcolor="#333F48" style="background-color:#333F48;">
+            <a href="{{ archive_index_url }}" style="display:inline-block;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:13px;letter-spacing:3px;text-transform:uppercase;color:#D9E8D6;text-decoration:none;padding:14px 32px;">
+              Consulter les archives →
+            </a>
           </td>
         </tr>
       </table>
-      <p style="margin:0;padding-top:18px;border-top:1px solid #222222;">
-        <a href="{{ archive_index_url }}" style="font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#D9E8D6;text-decoration:none;">◆ Toutes les éditions archivées →</a>
-      </p>
+    </td>
+  </tr>
+  <tr><td bgcolor="#333F48" height="2" style="background-color:#333F48;font-size:0;line-height:0;">&nbsp;</td></tr>
+
+  <!-- ===== CONTACT (compact) ===== -->
+  <tr>
+    <td bgcolor="#000000" style="background-color:#000000;padding:18px 32px;text-align:center;">
+      <p style="margin:0 0 12px 0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:11px;color:#FFFFFF;letter-spacing:1px;">Une suggestion ou une idée d'amélioration&nbsp;?</p>
+      <table cellpadding="0" cellspacing="0" border="0" align="center">
+        <tr>
+          <td style="border:1.5px solid #D9E8D6;">
+            <a href="mailto:{{ feedback_email }}?subject=Suggestion%20Huginn%20N°{{ issue_number_padded }}" style="display:inline-block;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#D9E8D6;text-decoration:none;padding:10px 24px;">✉ Contactez-nous</a>
+          </td>
+        </tr>
+      </table>
     </td>
   </tr>
 
   <!-- ===== FOOTER ===== -->
   <tr><td bgcolor="#D9E8D6" height="3" style="background-color:#D9E8D6;font-size:0;line-height:0;">&nbsp;</td></tr>
   <tr>
-    <td bgcolor="#333F48" style="background-color:#333F48;padding:32px 32px 34px;text-align:center;">
-      {% if arquus_white_b64 %}<img src="{{ arquus_white_b64 }}" width="120" alt="ARQUUS" style="display:block;width:120px;height:auto;border:0;margin:0 auto 18px auto;">{% endif %}
-      <p style="margin:0 0 12px 0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#D9E8D6;">Huginn — La pensée qui survole le monde</p>
-      <p style="margin:0 auto 18px auto;max-width:460px;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:12px;line-height:1.65;color:#FFFFFF;">Dans la mythologie nordique, Huginn est l'un des deux corbeaux d'Odin : il parcourt chaque jour les neuf mondes pour lui rapporter ce qu'il voit. Dans un contexte géopolitique où l'information terrestre devient une ressource stratégique, cet agent veille pour ARQUUS — filtre, trie, et délivre chaque semaine l'essentiel.</p>
-      <p style="margin:0;padding-top:16px;border-top:1px solid #2A3440;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#D9E8D6;">Revue Huginn · Veille interne ARQUUS · {{ feedback_email }}</p>
-      <p style="margin:12px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-weight:normal;font-style:italic;font-size:10px;line-height:1.5;color:#7A8A94;">⚠ Contenu généré automatiquement par IA à partir de flux RSS publics. Vérifiez les informations critiques en consultant les sources originales.</p>
+    <td bgcolor="#333F48" style="background-color:#333F48;padding:28px 32px 30px;text-align:center;">
+      {% if arquus_white_b64 %}<img src="{{ arquus_white_b64 }}" width="110" alt="ARQUUS" style="display:block;width:110px;height:auto;border:0;margin:0 auto 16px auto;">{% endif %}
+      <p style="margin:0 0 10px 0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#D9E8D6;">Huginn — La pensée qui survole le monde</p>
+      <p style="margin:0 auto 16px auto;max-width:460px;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:11px;line-height:1.65;color:#FFFFFF;">Dans la mythologie nordique, Huginn est l'un des deux corbeaux d'Odin : il parcourt chaque jour les neuf mondes pour lui rapporter ce qu'il voit. Dans un contexte géopolitique où l'information terrestre devient une ressource stratégique, cet agent veille pour ARQUUS — filtre, trie, et délivre chaque semaine l'essentiel.</p>
+      <p style="margin:0;padding-top:14px;border-top:1px solid #2A3440;font-family:Arial,Helvetica,sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#D9E8D6;">Revue Huginn · Veille interne ARQUUS · {{ feedback_email }}</p>
+      <p style="margin:10px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-weight:normal;font-style:italic;font-size:10px;line-height:1.5;color:#7A8A94;">⚠ Contenu généré automatiquement par IA à partir de flux RSS publics. Vérifiez les informations critiques en consultant les sources originales.</p>
     </td>
   </tr>
 
