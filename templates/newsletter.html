@@ -13,7 +13,7 @@
 <tr><td align="center" style="padding:30px 12px;" bgcolor="#1A1A1A">
 <table width="680" cellpadding="0" cellspacing="0" border="0" bgcolor="#FFFFFF" style="max-width:680px;">
 
-  <!-- MASTHEAD -->
+  <!-- ===== MASTHEAD ===== -->
   <tr>
     <td bgcolor="#D9E8D6" style="background-color:#D9E8D6;padding:18px 32px 16px;">
       <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border-bottom:1px solid #BDD1B9;padding-bottom:14px;margin-bottom:14px;">
@@ -40,24 +40,14 @@
   </tr>
   <tr><td bgcolor="#333F48" height="3" style="background-color:#333F48;font-size:0;line-height:0;">&nbsp;</td></tr>
 
-  <!-- SYNTHESE -->
-  <tr>
-    <td bgcolor="#FFFFFF" style="background-color:#FFFFFF;padding:28px 32px 22px;border-bottom:1px solid #E0DED7;">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:12px;">
-        <tr>
-          <td width="10" height="10" bgcolor="#D9E8D6" style="background-color:#D9E8D6;width:10px;height:10px;border:1.5px solid #333F48;">&nbsp;</td>
-          <td style="padding-left:10px;white-space:nowrap;"><span style="font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#333F48;">Synthèse de la semaine</span></td>
-          <td width="100%" style="border-bottom:1px solid #E0DED7;">&nbsp;</td>
-        </tr>
-      </table>
-      <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:15px;line-height:1.6;color:#000000;">{{ synthesis }}</p>
-    </td>
-  </tr>
-
-  <!-- THÈMES -->
+  <!-- ===== THÈMES ===== -->
   {% for section in themed_sections %}
+
+  {% set with_img = section.articles | selectattr("image_url") | list %}
+  {% set no_img   = section.articles | rejectattr("image_url") | list %}
+
   <tr>
-    <td bgcolor="#FFFFFF" style="background-color:#FFFFFF;padding:24px 32px 20px;{% if not loop.first %}border-top:1px solid #E0DED7;{% endif %}">
+    <td bgcolor="#FFFFFF" style="background-color:#FFFFFF;padding:24px 32px 20px;{% if not loop.first %}border-top:2px solid #E0DED7;{% endif %}">
 
       <!-- En-tête thème -->
       <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:18px;">
@@ -69,26 +59,18 @@
         </tr>
       </table>
 
-      <!-- Articles en grille 2 colonnes -->
-      {% set articles = section.articles %}
-      {% for i in range(0, articles|length, 2) %}
-      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:16px;">
+      <!-- Articles AVEC photo : grille 2 colonnes -->
+      {% if with_img %}
+      {% for i in range(0, with_img|length, 2) %}
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:{% if i + 2 < with_img|length or no_img %}18px{% else %}0{% endif %};">
         <tr valign="top">
 
           <!-- Article gauche -->
-          <td width="48%" style="padding-right:8px;">
-            {% set a = articles[i] %}
-            <a href="{{ a.link }}" style="text-decoration:none;display:block;">
-              {% if a.image_url %}
-              <img src="{{ a.image_url }}" width="308" alt="" style="display:block;width:100%;height:180px;object-fit:cover;border:0;margin-bottom:10px;">
-              {% else %}
-              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:10px;">
-                <tr><td bgcolor="#333F48" height="180" style="background-color:#333F48;height:180px;text-align:center;vertical-align:middle;">
-                  <span style="font-family:Arial,Helvetica,sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#D9E8D6;">{{ a.source }}</span>
-                </td></tr>
-              </table>
-              {% endif %}
-              <p style="margin:0 0 6px 0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#6B7178;">{{ a.source }} · {{ a.date[:10] }}</p>
+          <td width="49%" style="padding-right:6px;">
+            {% set a = with_img[i] %}
+            <a href="{{ a.link }}" style="text-decoration:none;display:block;color:#000000;">
+              <img src="{{ a.image_url }}" width="308" alt="" style="display:block;width:100%;height:175px;object-fit:cover;border:0;margin-bottom:8px;">
+              <p style="margin:0 0 5px 0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#6B7178;">{{ a.source }} · {{ a.date[:10] }}</p>
               <p style="margin:0 0 10px 0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:16px;line-height:1.3;color:#000000;">{{ a.title_fr }}</p>
             </a>
             <table cellpadding="0" cellspacing="0" border="0">
@@ -98,28 +80,16 @@
             </table>
           </td>
 
-          <!-- Séparateur vertical -->
-          <td width="4%" align="center" style="padding:0 4px;">
-            <table width="1" cellpadding="0" cellspacing="0" border="0" height="100%">
-              <tr><td bgcolor="#E0DED7" width="1" style="background-color:#E0DED7;">&nbsp;</td></tr>
-            </table>
-          </td>
+          <!-- Séparateur -->
+          <td width="2%" bgcolor="#E0DED7" style="background-color:#E0DED7;width:1px;">&nbsp;</td>
 
-          <!-- Article droit (si existe) -->
-          <td width="48%" style="padding-left:8px;">
-            {% if i+1 < articles|length %}
-            {% set b = articles[i+1] %}
-            <a href="{{ b.link }}" style="text-decoration:none;display:block;">
-              {% if b.image_url %}
-              <img src="{{ b.image_url }}" width="308" alt="" style="display:block;width:100%;height:180px;object-fit:cover;border:0;margin-bottom:10px;">
-              {% else %}
-              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:10px;">
-                <tr><td bgcolor="#333F48" height="180" style="background-color:#333F48;height:180px;text-align:center;vertical-align:middle;">
-                  <span style="font-family:Arial,Helvetica,sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#D9E8D6;">{{ b.source }}</span>
-                </td></tr>
-              </table>
-              {% endif %}
-              <p style="margin:0 0 6px 0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#6B7178;">{{ b.source }} · {{ b.date[:10] }}</p>
+          <!-- Article droit -->
+          <td width="49%" style="padding-left:6px;">
+            {% if i+1 < with_img|length %}
+            {% set b = with_img[i+1] %}
+            <a href="{{ b.link }}" style="text-decoration:none;display:block;color:#000000;">
+              <img src="{{ b.image_url }}" width="308" alt="" style="display:block;width:100%;height:175px;object-fit:cover;border:0;margin-bottom:8px;">
+              <p style="margin:0 0 5px 0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#6B7178;">{{ b.source }} · {{ b.date[:10] }}</p>
               <p style="margin:0 0 10px 0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:16px;line-height:1.3;color:#000000;">{{ b.title_fr }}</p>
             </a>
             <table cellpadding="0" cellspacing="0" border="0">
@@ -132,19 +102,45 @@
 
         </tr>
       </table>
-      {% if not loop.last or i + 2 < articles|length %}
-      <tr><td bgcolor="#E0DED7" height="1" style="background-color:#E0DED7;font-size:0;line-height:0;">&nbsp;</td></tr>
+      {% endfor %}
+      {% endif %}
+
+      <!-- Articles SANS photo : liste compacte séparée -->
+      {% if no_img %}
+      {% if with_img %}
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:10px;">
+        <tr><td bgcolor="#E0DED7" height="1" style="background-color:#E0DED7;font-size:0;line-height:0;">&nbsp;</td></tr>
+      </table>
+      {% endif %}
+      {% for a in no_img %}
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:{% if not loop.last %}12px{% else %}0{% endif %};">
+        <tr valign="middle">
+          <!-- Trait vertical coloré -->
+          <td width="3" bgcolor="#D9E8D6" style="background-color:#D9E8D6;width:3px;">&nbsp;</td>
+          <td style="padding:8px 0 8px 14px;">
+            <p style="margin:0 0 3px 0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#6B7178;">{{ a.source }} · {{ a.date[:10] }}</p>
+            <p style="margin:0 0 8px 0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:15px;line-height:1.3;color:#000000;">{{ a.title_fr }}</p>
+            <table cellpadding="0" cellspacing="0" border="0">
+              <tr><td style="border:1.5px solid #333F48;">
+                <a href="{{ a.link }}" style="display:inline-block;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#333F48;text-decoration:none;padding:6px 12px;">Lire →</a>
+              </td></tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+      {% if not loop.last %}
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr><td bgcolor="#E0DED7" height="1" style="background-color:#E0DED7;font-size:0;line-height:0;">&nbsp;</td></tr>
+      </table>
       {% endif %}
       {% endfor %}
+      {% endif %}
 
     </td>
   </tr>
-  {% if not loop.last %}
-  <tr><td bgcolor="#E0DED7" height="1" style="background-color:#E0DED7;font-size:0;line-height:0;">&nbsp;</td></tr>
-  {% endif %}
   {% endfor %}
 
-  <!-- FEEDBACK -->
+  <!-- ===== FEEDBACK ===== -->
   <tr>
     <td bgcolor="#000000" style="background-color:#000000;padding:28px 32px;text-align:center;">
       <p style="margin:0 0 12px 0;font-family:Arial,Helvetica,sans-serif;font-weight:bold;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#D9E8D6;">◆ Votre avis compte</p>
@@ -165,7 +161,7 @@
     </td>
   </tr>
 
-  <!-- FOOTER -->
+  <!-- ===== FOOTER ===== -->
   <tr><td bgcolor="#D9E8D6" height="3" style="background-color:#D9E8D6;font-size:0;line-height:0;">&nbsp;</td></tr>
   <tr>
     <td bgcolor="#333F48" style="background-color:#333F48;padding:32px 32px 34px;text-align:center;">
