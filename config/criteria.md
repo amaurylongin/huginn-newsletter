@@ -65,4 +65,3 @@ Concurrents et partenaires : **KNDS, Rheinmetall, Hanwha, Oshkosh, BAE Systems L
 - **RH militaire** : recrutement, solde, concours, cérémonies, défilés, sport militaire
 - **Nucléaire stratégique**
 - **Politique intérieure** sans lien avec la défense ou l'industrie d'armement
-- **Articles trop généralistes** sans lien concret avec les véhicules terrestres ou l'industrie blindée
