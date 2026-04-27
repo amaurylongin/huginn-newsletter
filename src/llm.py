@@ -10,36 +10,27 @@ from google.genai import errors as genai_errors
 
 MODEL_NAME = "gemini-3.1-flash-lite-preview"
 
-SYSTEM_PROMPT = """Tu es HUGINN, agent de veille OSINT pour ARQUUS (constructeur français de véhicules blindés terrestres).
+SYSTEM_PROMPT = """Tu es HUGINN, agent de veille OSINT pour ARQUUS (constructeur français de véhicules militaires terrestres : Griffon, Serval, Jaguar, VBCI, VAB...).
 
-Mission : analyser une liste d'articles RSS de défense et produire une newsletter visuelle ultra-concise.
+Mission : sélectionner et titrer les articles RSS les plus pertinents pour ARQUUS.
 
 RÈGLES ABSOLUES :
-1. Ne retenir QUE les articles qui ont un champ image_url non null — les articles sans image sont EXCLUS systématiquement, sans exception.
-2. Filtrer selon les critères thématiques (inclusion/exclusion fournis).
-3. Minimum 2 articles retenus, maximum 10.
-4. Générer un titre en français de 6 MOTS MAXIMUM par article — percutant et factuel.
-5. Traduire intégralement en français.
-6. Ne jamais inventer d'information.
-7. Retourner UNIQUEMENT du JSON valide, sans balises markdown.
+1. Ne retenir QUE les articles avec image_url non null — exclusion systématique sans exception.
+2. Ne retenir QUE les articles ayant un lien direct avec le métier d'ARQUUS (véhicules terrestres, blindés, mobilité militaire, protection, technologie embarquée, industrie défense terrestre, conflits impliquant des véhicules terrestres). Tout article trop généraliste ou sans rapport direct est exclu.
+3. Minimum 2 articles, maximum 10.
+4. Générer un titre en français de 6 MOTS MAXIMUM — percutant, factuel, en français.
+5. Ne jamais inventer d'information.
+6. Retourner UNIQUEMENT du JSON valide, sans balises markdown.
 
-THÈMES (exactement ces libellés) :
-- "Contrats & Industrie"
-- "Front ukrainien"
-- "Innovation & Technologie"
-- "Géopolitique"
-- "Conflits & Zones chaudes"
-
-SCHÉMA JSON STRICT (aucun autre champ) :
+SCHÉMA JSON STRICT :
 {
   "articles": [
     {
       "title_fr": "titre 6 mots max",
-      "theme": "un des 5 thèmes",
       "source": "nom de la source",
       "date": "date ISO",
       "link": "URL originale",
-      "image_url": "URL image — JAMAIS null ici"
+      "image_url": "URL image — jamais null"
     }
   ]
 }
@@ -53,14 +44,11 @@ def analyze_articles(raw_articles, criteria):
 
     client = genai.Client(api_key=api_key)
 
-    # On n'envoie à Gemini que les articles qui ont déjà une image
-    # pour lui simplifier la tâche et économiser des tokens
     articles_with_image = [a for a in raw_articles if a.get("image_url")]
-    articles_without   = len(raw_articles) - len(articles_with_image)
-    print(f"  → {len(articles_with_image)} articles avec image / {articles_without} sans image (ignorés)")
+    print(f"  → {len(articles_with_image)} articles avec image / {len(raw_articles) - len(articles_with_image)} sans (ignorés)")
 
     if not articles_with_image:
-        print("  ⚠ Aucun article avec image cette semaine.")
+        print("  ⚠ Aucun article avec image.")
         return {"articles": []}
 
     compact = []
@@ -75,10 +63,10 @@ def analyze_articles(raw_articles, criteria):
         })
 
     user_prompt = (
-        f"# CRITÈRES\n\n{criteria}\n\n"
+        f"# CRITÈRES ARQUUS\n\n{criteria}\n\n"
         f"# ARTICLES (tous ont une image)\n\n"
         f"{json.dumps(compact, ensure_ascii=False, indent=2)}\n\n"
-        "Produis le JSON final. Rappel : ne garder que les articles pertinents selon les critères."
+        "Sélectionne uniquement les articles pertinents pour ARQUUS et produis le JSON."
     )
 
     models_to_try = [MODEL_NAME, "gemini-2.0-flash", "gemini-2.5-pro"]
@@ -106,7 +94,7 @@ def analyze_articles(raw_articles, criteria):
                 last_error = e
                 if attempt < len(delays) - 1:
                     wait = delays[attempt]
-                    print(f"    ⚠ Serveur indisponible — retry dans {wait}s (tentative {attempt+2}/{len(delays)})")
+                    print(f"    ⚠ Indisponible — retry dans {wait}s (tentative {attempt+2}/{len(delays)})")
                     time.sleep(wait)
                 else:
                     print(f"    ❌ Échec après {len(delays)} tentatives sur {model_name}")
@@ -135,8 +123,7 @@ def analyze_articles(raw_articles, criteria):
         cleaned = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw_text, flags=re.MULTILINE).strip()
         result = json.loads(cleaned)
 
-    # Sécurité : on filtre côté Python aussi au cas où Gemini aurait quand même
-    # inclus un article sans image
+    # Sécurité : double vérification Python
     result["articles"] = [a for a in result.get("articles", []) if a.get("image_url")]
     return result
 
