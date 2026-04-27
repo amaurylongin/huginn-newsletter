@@ -39,18 +39,17 @@ BAROMÈTRE (niveau 1 à 5) :
 
 SCHÉMA JSON STRICT :
 {
-  "synthesis": "2-3 lignes résumant les dynamiques de la semaine",
-  "barometer_text": "1 ligne décrivant l'intensité",
-  "barometer_level": 3,
   "articles": [
     {
       "title_fr": "titre 6 mots max en français",
-      "theme": "un des 5 thèmes",
+      "theme": "un des 5 thèmes listés",
       "source": "nom de la source",
       "date": "date ISO",
       "link": "URL originale",
       "image_url": "URL image ou null"
     }
+  ]
+}
   ]
 }
 """
