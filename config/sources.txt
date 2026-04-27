@@ -25,3 +25,6 @@ https://www.jpost.com/Israel-News/feed
 # === INDUSTRIE ===
 https://www.defenseindustrydaily.com/feed/
 https://www.shephard.co.uk/news/land-warfare/rss/
+
+
+https://opexnews.fr/
