@@ -1,18 +1,35 @@
-# CRITÈRES DE FILTRAGE HUGINN
+# CRITÈRES DE FILTRAGE HUGINN — ARQUUS OSINT
 
-## ✅ DOMAINES PRIORITAIRES (inclure)
+## QUI SOMMES-NOUS ?
+ARQUUS est un constructeur français de véhicules militaires terrestres (Griffon, Serval, Jaguar, VBCI, VAB, etc.), filiale de Volvo Group Defense. Notre activité couvre la conception, la fabrication, la maintenance et la modernisation de véhicules blindés et logistiques pour les armées. **Tout article retenu doit avoir un lien direct avec notre métier ou notre environnement concurrentiel et opérationnel.**
 
-### Véhicules blindés
-Char, tank, MBT, IFV, APC, MRAP, véhicule de combat, VAB, VBCI, AMX-10RC, Jaguar, Griffon, Serval, Leclerc, Leopard 1/2, Abrams M1, T-72, T-80, T-90, T-14 Armata, Bradley, CV90, Lynx, Puma IFV, K2, AS21 Redback, Challenger 2, Stryker, LAV, Boxer, Piranha.
+---
 
-### Logistique et génie
-Camions militaires tactiques, véhicules logistiques militaires, véhicules du génie, engins blindés du génie.
+## ✅ INCLURE — DOMAINES PRIORITAIRES
+
+### Véhicules blindés et de combat
+Char, tank, MBT, IFV, APC, MRAP, véhicule de combat, VAB, VBCI, AMX-10RC, Jaguar, Griffon, Serval, Leclerc, Leopard 1/2, Abrams M1, T-72, T-80, T-90, T-14 Armata, Bradley, CV90, Lynx, Puma IFV, K2, AS21 Redback, Challenger 2, Stryker, LAV, Boxer, Piranha, véhicule blindé léger, véhicule blindé de transport de troupes.
+
+### Propulsion, mobilité et énergie
+Motorisation militaire, hybridation thermique-électrique, électromobilité militaire, groupe motopropulseur blindé, transmission militaire, véhicule hybride militaire, énergie embarquée, autonomie énergétique, pile à combustible militaire, gestion énergie à bord.
+
+### Chenilles et mobilité tout-terrain
+Véhicule chenillé, chenille caoutchouc, train de roulement blindé, chenille composite, mobilité hors-route militaire, traction tout-terrain, suspension active militaire.
+
+### Technologies embarquées et véhicule augmenté
+IHM militaire (interface homme-machine), véhicule augmenté, intelligence artificielle embarquée, aide à la conduite militaire, conduite autonome militaire, système de navigation militaire, vision nocturne, optronique, intelligence de conduite, coopération homme-machine, assistance au conducteur.
+
+### Survivabilité et protection
+Blindage, ERA (explosive reactive armor), cage armor, slat armor, APS (active protection system), Trophy, Arena, protection balistique, protection IED, mine protection, STANAG, niveau de protection, signature radar, furtivité véhicule terrestre, réduction signature infrarouge.
+
+### Logistique et génie militaire
+Camions militaires tactiques, véhicule logistique militaire, véhicule du génie, engin blindé du génie, pont militaire, franchissement, déminage, véhicule de dépannage blindé.
 
 ### Drones terrestres (UGV)
-Robot terrestre, véhicule autonome sol, THeMIS, Milrem, robot de combat, robot logistique, robot d'assaut, drone sol, ground drone, unmanned ground vehicle.
+Robot terrestre, véhicule autonome sol, THeMIS, Milrem, robot de combat, robot logistique, robot d'assaut, drone sol, ground drone, unmanned ground vehicle, essaim de robots.
 
 ### Drones aériens en contexte terrestre
-FPV, loitering munition, munition rôdeuse, Lancet, Shahed, Baba Yaga, Switchblade, Phoenix Ghost, KUB, Warmate, drone kamikaze, essaim de drones, fiber optic drone (drone filaire).
+FPV, loitering munition, munition rôdeuse, Lancet, Shahed, Baba Yaga, Switchblade, Phoenix Ghost, KUB, Warmate, drone kamikaze, drone filaire, fiber optic drone, essaim de drones (impact sur les blindés uniquement).
 
 ### Artillerie
 Obusier, Caesar, K9, PzH 2000, M109, howitzer, HIMARS, M270 MLRS, lance-roquettes, artillerie automotrice, obus, munition d'artillerie, contre-batterie.
@@ -20,47 +37,32 @@ Obusier, Caesar, K9, PzH 2000, M109, howitzer, HIMARS, M270 MLRS, lance-roquette
 ### Missiles et systèmes antichar
 ATGM, Javelin, Kornet, NLAW, Spike, Milan, HOT, TOW, missile antichar, roquette antichar, RPG.
 
-### Guerre électronique terrestre
-Brouillage GPS, EW, leurre, guerre du spectre, jamming, spoofing.
+### Guerre électronique terrestre et C-UAS
+Brouillage GPS, EW terrestre, leurre, guerre du spectre, jamming, spoofing, système anti-drone terrestre, C-UAS mobile.
 
-### Génie et protection
-Mines, IED, déminage, génie militaire, obstacle, franchissement, ponts militaires, blindage, ERA, cage armor, APS, Trophy, Arena.
-
-### C-UAS terrestres
-Systèmes anti-drone terrestres.
-
-### Munitions
+### Munitions terrestres
 Obus antichar, APFSDS, HEAT, thermobarique, cluster.
 
-### Conflits et zones à suivre
-- **Ukraine** : front, offensive, contre-offensive, Donbass, Kharkiv, Zaporijjia, Kherson, Bakhmout, Avdiivka, Kursk, Soumy, ligne de front, UGV mission, robot ukrainien
-- **Proche-Orient** : Gaza, Cisjordanie, Liban Sud, Israel, Hezbollah, Hamas, char Merkava, D9 Doobi
-- **Sahel** : Mali, Niger, Burkina Faso, Wagner, opérations terrestres africaines
-- **Iran / Yémen / Houthis** (attaques terrestres uniquement)
-- **Asie** : Taiwan, Corée (tensions et équipements terrestres)
-- **Europe** : OTAN, réarmement européen terrestre, budget blindés, contrats véhicules
+### Conflits et théâtres opérationnels (angle terrestre uniquement)
+- **Ukraine** : opérations blindées, drones contre blindés, pertes de véhicules, tactiques terrestres, UGV en opération
+- **Proche-Orient** : Gaza, Liban, Israël, Merkava, D9, opérations blindées
+- **Sahel** : Mali, Niger, Burkina Faso, opérations terrestres africaines
+- **Asie** : Taiwan, Corée, équipements terrestres, tensions
+- **Europe** : OTAN, réarmement terrestre, budgets blindés, contrats véhicules
 
-### Industrie et contrats
-Commandes et livraisons de blindés, contrats véhicules militaires. Acteurs clés : KNDS, Rheinmetall, Hanwha, Oshkosh, BAE Systems, Leonardo, Nexter, **Arquus**, Renault Trucks Defense, Textron, General Dynamics Land Systems, Elbit, Rafael, IMI.
+### Industrie et marchés défense terrestre
+Commandes, livraisons, contrats véhicules militaires, appels d'offres blindés.
+Concurrents et partenaires : **KNDS, Rheinmetall, Hanwha, Oshkosh, BAE Systems Land, Leonardo DRS, Nexter, Arquus, Renault Trucks Defense, Textron, GDLS, Elbit, Rafael, IMI, Milrem, Arquus.**
 
 ---
 
-## ❌ À EXCLURE ABSOLUMENT
+## ❌ EXCLURE ABSOLUMENT
 
-- **Aviation** : bombardier, chasseur, F-35, F-16, avion de combat, pilote, air force
-- **Marine** : frégate, porte-avions, sous-marin, destroyer, navire, navy
-- **Espace, satellites, cybersécurité pure**
-- **RH militaire** : recrutement, solde, compétitions sportives, cérémonies, défilés
+- **Aviation** : chasseur, bombardier, F-35, F-16, hélicoptère de combat, avion, pilote, air force — sauf si l'article concerne directement la menace aérienne contre les blindés
+- **Marine** : frégate, porte-avions, sous-marin, destroyer, navire, navy, maritime
+- **Espace et satellites** : sauf si application directe au guidage de systèmes terrestres
+- **Cybersécurité pure** : sans lien avec les systèmes embarqués ou les véhicules
+- **RH militaire** : recrutement, solde, concours, cérémonies, défilés, sport militaire
 - **Nucléaire stratégique**
-
----
-
-## 📊 THÈMES DE CLASSEMENT
-
-Chaque article retenu doit être classé dans **exactement un** des thèmes suivants :
-
-1. **Contrats & Industrie** — commandes, livraisons, partenariats industriels, lignes de production
-2. **Front ukrainien** — opérations militaires, pertes, tactiques observées en Ukraine
-3. **Innovation & Technologie** — nouveaux systèmes, retours d'expérience tactiques, R&D
-4. **Géopolitique** — décisions politiques, accords de défense, réarmement, diplomatie
-5. **Conflits & Zones chaudes** — autres théâtres d'opérations (Proche-Orient, Sahel, Asie)
+- **Politique intérieure** sans lien avec la défense ou l'industrie d'armement
+- **Articles trop généralistes** sans lien concret avec les véhicules terrestres ou l'industrie blindée
