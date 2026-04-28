@@ -32,7 +32,7 @@ def main():
     criteria       = (PROJECT_ROOT / "config" / "criteria.md").read_text(encoding="utf-8")
     recipients_env = os.environ.get("RECIPIENTS", "")
     recipients     = [r.strip() for r in recipients_env.split(",") if r.strip()]
-    mode           = os.environ.get("GH_MODE", "rss").strip().lower()
+    mode           = os.environ.get("GH_MODE", "search").strip().lower()
 
     print(f"\n▸ Mode : {mode.upper()}")
     print(f"▸ {len(recipients)} destinataire(s)")
