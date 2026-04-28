@@ -9,7 +9,7 @@ from google import genai
 from google.genai import types
 from google.genai import errors as genai_errors
 
-MODEL_NAME = "gemini-2.0-flash"
+MODEL_NAME = "gemini-3.1-flash-lite-preview"
 
 # Sources reconnues comme fiables en défense terrestre (score de référence)
 TRUSTED_SOURCES = """
@@ -113,45 +113,52 @@ def search_articles(criteria, start_date, end_date):
         f"de sources avec score >= 3. Produis le JSON final."
     )
 
+    models_to_try = [MODEL_NAME, "gemini-3.1-flash-lite-preview", "gemini-2.5-pro"]
     delays = [20, 45, 90]
     response = None
     last_error = None
 
-    for attempt in range(len(delays)):
-        try:
-            print(f"  ▸ Recherche multilingue (tentative {attempt+1}/{len(delays)})...")
-            response = client.models.generate_content(
-                model=MODEL_NAME,
-                contents=user_prompt,
-                config=types.GenerateContentConfig(
-                    system_instruction=SEARCH_PROMPT,
-                    tools=[types.Tool(google_search=types.GoogleSearch())],
-                    temperature=0.2,
-                    max_output_tokens=8192,
-                ),
-            )
-            print("  ✓ Réponse reçue")
+    for model_name in models_to_try:
+        print(f"  ▸ Recherche multilingue avec {model_name}...")
+        for attempt in range(len(delays)):
+            try:
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=user_prompt,
+                    config=types.GenerateContentConfig(
+                        system_instruction=SEARCH_PROMPT,
+                        tools=[types.Tool(google_search=types.GoogleSearch())],
+                        temperature=0.2,
+                        max_output_tokens=8192,
+                    ),
+                )
+                print("  ✓ Réponse reçue")
+                break
+            except genai_errors.ServerError as e:
+                last_error = e
+                if attempt < len(delays) - 1:
+                    wait = delays[attempt]
+                    print(f"    ⚠ Indisponible — retry dans {wait}s")
+                    time.sleep(wait)
+                else:
+                    print(f"    ❌ Échec sur {model_name}")
+            except genai_errors.ClientError as e:
+                last_error = e
+                code = str(getattr(e, "code", ""))
+                if code == "429" and attempt < len(delays) - 1:
+                    wait = delays[attempt]
+                    print(f"    ⚠ Rate limit — retry dans {wait}s")
+                    time.sleep(wait)
+                elif code in ("429", "503"):
+                    print(f"    ❌ Quota épuisé sur {model_name} — passage au suivant")
+                    break
+                else:
+                    raise
+        if response is not None:
             break
-        except genai_errors.ServerError as e:
-            last_error = e
-            if attempt < len(delays) - 1:
-                wait = delays[attempt]
-                print(f"    ⚠ Indisponible — retry dans {wait}s")
-                time.sleep(wait)
-            else:
-                raise
-        except genai_errors.ClientError as e:
-            last_error = e
-            code = str(getattr(e, "code", ""))
-            if code == "429" and attempt < len(delays) - 1:
-                wait = delays[attempt]
-                print(f"    ⚠ Rate limit — retry dans {wait}s")
-                time.sleep(wait)
-            else:
-                raise
 
     if response is None:
-        raise RuntimeError(f"Impossible d'obtenir une réponse. Erreur : {last_error}")
+        raise RuntimeError(f"Impossible d'obtenir une réponse Gemini. Dernière erreur : {last_error}")
 
     raw_text = response.text.strip() if response.text else ""
 
