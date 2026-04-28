@@ -1,150 +1,114 @@
-"""Récupération d'articles depuis les flux RSS avec User-Agent navigateur."""
-import feedparser
-import urllib.request
-import ssl
-from datetime import datetime, timezone, timedelta
-from dateutil import parser as date_parser
+"""HUGINN — point d'entrée principal.
 
-# User-Agent d'un navigateur réel — évite d'être bloqué par les serveurs
-HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/124.0.0.0 Safari/537.36"
-    ),
-    "Accept": "application/rss+xml, application/xml, text/xml, */*",
-    "Accept-Language": "fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7",
-    "Cache-Control": "no-cache",
-}
+Deux modes disponibles, contrôlés par la variable GH_MODE :
+  - GH_MODE=rss    (défaut) : collecte via flux RSS dans config/sources.txt
+  - GH_MODE=search : Gemini cherche lui-même sur le web dans toutes les langues
 
+Pour basculer en mode search :
+  GitHub → Settings → Variables → Ajouter GH_MODE = search
+"""
+import sys
+import os
+from pathlib import Path
+from datetime import datetime, timedelta, timezone
 
-def _fetch_feed(url):
-    """Télécharge le contenu d'un flux RSS avec des en-têtes navigateur."""
-    ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
+from renderer import render_newsletter
+from mailer import send_newsletter
+from archiver import save_to_archive, update_archive_index, get_next_issue_number
 
-    req = urllib.request.Request(url, headers=HEADERS)
-    with urllib.request.urlopen(req, timeout=15, context=ctx) as resp:
-        raw = resp.read()
-    return feedparser.parse(raw)
+PROJECT_ROOT = Path(__file__).parent.parent
 
 
-def fetch_articles(sources, start_date, end_date):
-    """Récupère tous les articles publiés entre start_date et end_date."""
+def _load_lines(filepath):
+    return [l.strip() for l in filepath.read_text(encoding="utf-8").splitlines()
+            if l.strip() and not l.strip().startswith("#")]
+
+
+def main():
+    print("=" * 60)
+    print("HUGINN — Génération de la revue hebdomadaire")
+    print("=" * 60)
+
+    criteria       = (PROJECT_ROOT / "config" / "criteria.md").read_text(encoding="utf-8")
+    recipients_env = os.environ.get("RECIPIENTS", "")
+    recipients     = [r.strip() for r in recipients_env.split(",") if r.strip()]
+    mode           = os.environ.get("GH_MODE", "rss").strip().lower()
+
+    print(f"\n▸ Mode : {mode.upper()}")
+    print(f"▸ {len(recipients)} destinataire(s)")
+
+    if not recipients:
+        print("❌ Aucun destinataire. Arrêt.")
+        sys.exit(1)
+
+    end_date   = datetime.now(timezone.utc)
+    start_date = end_date - timedelta(days=7)
+    print(f"▸ Fenêtre : {start_date.date()} → {end_date.date()}")
+
     articles = []
 
-    if start_date.tzinfo is None:
-        start_date = start_date.replace(tzinfo=timezone.utc)
-    if end_date.tzinfo is None:
-        end_date = end_date.replace(tzinfo=timezone.utc)
+    # ── MODE RSS ──────────────────────────────────────────────
+    if mode == "rss":
+        from rss import fetch_articles
+        from llm import analyze_articles
 
-    # Fenêtre élargie de 3 jours pour absorber les décalages de timezone
-    extended_start = start_date - timedelta(days=3)
+        sources = _load_lines(PROJECT_ROOT / "config" / "sources.txt")
+        print(f"▸ {len(sources)} source(s) RSS")
+        print("\n▸ Collecte des flux RSS...")
+        raw_articles = fetch_articles(sources, start_date, end_date)
+        print(f"\n▸ {len(raw_articles)} article(s) brut(s) récupéré(s)")
 
-    for source_url in sources:
-        try:
-            print(f"  → {source_url}")
-            feed = _fetch_feed(source_url)
+        if not raw_articles:
+            print("❌ Aucun article. Arrêt.")
+            sys.exit(0)
 
-            if not feed.entries:
-                # Fallback : laisser feedparser gérer lui-même (certains sites
-                # acceptent feedparser mais pas urllib)
-                feed = feedparser.parse(
-                    source_url,
-                    agent=HEADERS["User-Agent"],
-                )
+        print("\n▸ Analyse et filtrage via Gemini...")
+        result   = analyze_articles(raw_articles, criteria)
+        articles = result.get("articles", [])
 
-            if not feed.entries:
-                print(f"     ⚠ Flux vide ou inaccessible")
-                continue
+    # ── MODE SEARCH ───────────────────────────────────────────
+    elif mode == "search":
+        from searcher import search_articles
 
-            source_name = feed.feed.get("title", source_url)
-            count = 0
+        print("\n▸ Recherche autonome via Gemini + Google Search...")
+        articles = search_articles(criteria, start_date, end_date)
 
-            for entry in feed.entries:
-                pub_date = _parse_date(entry)
+    else:
+        print(f"❌ Mode inconnu : '{mode}'. Utilisez 'rss' ou 'search'.")
+        sys.exit(1)
 
-                if pub_date is None:
-                    # Date illisible → on inclut avec date fictive
-                    articles.append({
-                        "title": (entry.get("title") or "").strip(),
-                        "summary": _extract_summary(entry),
-                        "link": entry.get("link", ""),
-                        "source": source_name,
-                        "date": end_date.isoformat(),
-                        "image_url": _extract_image(entry),
-                    })
-                    count += 1
-                    continue
+    # ── SUITE COMMUNE ─────────────────────────────────────────
+    print(f"\n▸ {len(articles)} article(s) retenu(s)")
 
-                if pub_date.tzinfo is None:
-                    pub_date = pub_date.replace(tzinfo=timezone.utc)
+    if len(articles) < 2:
+        print("ℹ Moins de 2 articles. Newsletter non envoyée.")
+        sys.exit(0)
 
-                if not (extended_start <= pub_date <= end_date):
-                    continue
+    issue_number = get_next_issue_number()
+    print(f"▸ Édition N°{issue_number:03d}")
 
-                articles.append({
-                    "title": (entry.get("title") or "").strip(),
-                    "summary": _extract_summary(entry),
-                    "link": entry.get("link", ""),
-                    "source": source_name,
-                    "date": pub_date.isoformat(),
-                    "image_url": _extract_image(entry),
-                })
-                count += 1
+    print("\n▸ Rendu de la newsletter...")
+    html = render_newsletter(
+        articles=articles,
+        synthesis="",
+        barometer_text="",
+        barometer_level=3,
+        issue_number=issue_number,
+        start_date=start_date,
+        end_date=end_date,
+    )
 
-            print(f"     {count} article(s) récupéré(s)")
+    print("\n▸ Archivage...")
+    save_to_archive(html, end_date, issue_number)
+    update_archive_index()
 
-        except Exception as e:
-            print(f"     ⚠ erreur : {e}")
-            continue
+    print(f"\n▸ Envoi à {len(recipients)} destinataire(s)...")
+    send_newsletter(recipients, html, issue_number, start_date, end_date)
 
-    return articles
+    print("\n" + "=" * 60)
+    print(f"✓ HUGINN N°{issue_number:03d} diffusée ({mode.upper()} mode).")
+    print("=" * 60)
 
 
-def _parse_date(entry):
-    """Tente d'extraire une date depuis différents champs RSS."""
-    for field in ("published", "updated", "created", "date"):
-        raw = entry.get(field)
-        if not raw:
-            continue
-        try:
-            return date_parser.parse(str(raw), fuzzy=True)
-        except Exception:
-            continue
-
-    for field in ("published_parsed", "updated_parsed", "created_parsed"):
-        parsed = entry.get(field)
-        if parsed:
-            try:
-                return datetime(*parsed[:6], tzinfo=timezone.utc)
-            except Exception:
-                continue
-
-    return None
-
-
-def _extract_summary(entry):
-    """Récupère le résumé disponible."""
-    content = entry.get("content")
-    if isinstance(content, list) and content:
-        return content[0].get("value", "")
-    return entry.get("summary") or entry.get("description") or ""
-
-
-def _extract_image(entry):
-    """Cherche une image hero dans les différents champs."""
-    for media in (entry.get("media_content") or []):
-        if isinstance(media, dict) and media.get("url"):
-            return media["url"]
-    for thumb in (entry.get("media_thumbnail") or []):
-        if isinstance(thumb, dict) and thumb.get("url"):
-            return thumb["url"]
-    for enc in (entry.get("enclosures") or []):
-        if isinstance(enc, dict) and str(enc.get("type", "")).startswith("image/"):
-            return enc.get("href") or enc.get("url")
-    for link in (entry.get("links") or []):
-        if isinstance(link, dict) and str(link.get("type", "")).startswith("image/"):
-            return link.get("href")
-    return None
+if __name__ == "__main__":
+    main()
