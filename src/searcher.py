@@ -196,9 +196,23 @@ def search_articles(criteria, start_date, end_date):
 
     print(f"  → {len(normalized)} article(s) retenus")
     print(f"  → {with_img} avec image / {without_img} sans image")
+
     if normalized:
-        langs_sources = list(set(a["source"] for a in normalized))[:5]
-        print(f"  → Sources : {', '.join(langs_sources)}...")
+        score_labels = {5: "★★★★★ Référence", 4: "★★★★☆ Fiable   ",
+                        3: "★★★☆☆ Acceptable", 2: "★★☆☆☆ Prudence ",
+                        1: "★☆☆☆☆ Exclu    "}
+        print("")
+        print("  ┌─────────────────────────────────────────────────┐")
+        print("  │         FIABILITÉ DES SOURCES RETENUES          │")
+        print("  ├───────────────────────────────┬─────────────────┤")
+        print("  │ Source                        │ Score           │")
+        print("  ├───────────────────────────────┼─────────────────┤")
+        for a in normalized:
+            score = a.get("source_score", 3)
+            label = score_labels.get(score, "—")
+            source = a["source"][:29].ljust(29)
+            print(f"  │ {source} │ {score}/5 {label} │")
+        print("  └───────────────────────────────┴─────────────────┘")
 
     return normalized
 
