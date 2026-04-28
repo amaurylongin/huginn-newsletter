@@ -17,7 +17,326 @@
     color: #000000;
     min-height: 100vh;
   }
+a<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revue Huginn — Archives</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
 
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    background: #F2F1EC;
+    color: #000;
+    min-height: 100vh;
+  }
+
+  /* ===== HEADER ===== */
+  .header {
+    background: #D9E8D6;
+    border-bottom: 3px solid #333F48;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 16px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .logo-arquus { height: 44px; width: auto; }
+
+  .header-title {
+    font-size: 32px;
+    letter-spacing: 10px;
+    text-transform: uppercase;
+    color: #333F48;
+    padding-left: 10px;
+  }
+
+  .logo-huginn { height: 64px; width: auto; margin-right: -8px; }
+
+  /* ===== HERO ===== */
+  .hero {
+    background: #333F48;
+    padding: 48px 40px 40px;
+    text-align: center;
+    border-bottom: 3px solid #D9E8D6;
+  }
+
+  .hero-label {
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #D9E8D6;
+    margin-bottom: 12px;
+  }
+
+  .hero-title {
+    font-size: 28px;
+    letter-spacing: 2px;
+    color: #FFFFFF;
+    margin-bottom: 8px;
+  }
+
+  .hero-sub {
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #7A8A94;
+  }
+
+  /* ===== MAIN ===== */
+  .main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 48px 40px 80px;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .section-bar {
+    width: 4px;
+    height: 24px;
+    background: #D9E8D6;
+    border: 1.5px solid #333F48;
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #333F48;
+  }
+
+  .section-count {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #888780;
+    margin-left: auto;
+  }
+
+  /* ===== GRILLE ===== */
+  .editions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 2px;
+    background: #333F48;
+    border: 2px solid #333F48;
+  }
+
+  .edition-card {
+    background: #FFFFFF;
+    text-decoration: none;
+    color: #000;
+    display: flex;
+    flex-direction: column;
+    transition: background 0.15s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .edition-card:hover { background: #D9E8D6; }
+
+  .edition-card-num {
+    background: #333F48;
+    padding: 12px 18px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .num-label {
+    font-size: 18px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #D9E8D6;
+  }
+
+  .num-arrow {
+    font-size: 14px;
+    color: #7A8A94;
+    transition: color 0.15s, transform 0.15s;
+  }
+
+  .edition-card:hover .num-arrow {
+    color: #D9E8D6;
+    transform: translateX(4px);
+  }
+
+  .edition-card-body {
+    padding: 14px 18px 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .edition-revue {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #7A8A94;
+  }
+
+  .edition-date {
+    font-size: 14px;
+    color: #000;
+    line-height: 1.3;
+  }
+
+  .edition-card-line {
+    height: 2px;
+    background: #D9E8D6;
+    margin: 0 18px;
+    transition: background 0.15s;
+  }
+
+  .edition-card:hover .edition-card-line { background: #333F48; }
+
+  /* ===== VIDE ===== */
+  .empty {
+    text-align: center;
+    padding: 80px 0;
+    color: #888780;
+  }
+
+  .empty p { font-size: 13px; letter-spacing: 1px; line-height: 2; }
+
+  /* ===== FOOTER ===== */
+  footer {
+    background: #333F48;
+    border-top: 3px solid #D9E8D6;
+  }
+
+  .footer-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 40px;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+  }
+
+  .footer-logo { height: 50px; width: auto; flex-shrink: 0; }
+
+  .footer-sep {
+    width: 1px;
+    height: 60px;
+    background: rgba(217,232,214,0.25);
+    flex-shrink: 0;
+  }
+
+  .footer-text {
+    font-size: 11px;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.75);
+  }
+
+  .footer-legal {
+    margin-left: auto;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #7A8A94;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 700px) {
+    .header-inner { padding: 14px 20px; }
+    .header-title { font-size: 22px; letter-spacing: 6px; }
+    .hero { padding: 32px 20px 28px; }
+    .main { padding: 32px 20px 60px; }
+    .editions-grid { grid-template-columns: repeat(2, 1fr); }
+    .footer-inner { flex-direction: column; gap: 20px; padding: 24px 20px; }
+    .footer-sep { display: none; }
+    .footer-legal { margin-left: 0; text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <img class="logo-arquus" src="{{ gh_pages_url }}/assets/arquus-logo-dark.png" alt="ARQUUS">
+    <span class="header-title">Huginn</span>
+    <img class="logo-huginn" src="{{ gh_pages_url }}/assets/huginn-logo.png" alt="HUGINN">
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <p class="hero-label">◆ Veille de défense terrestre · ARQUUS</p>
+  <h1 class="hero-title">Archives de la Revue Huginn</h1>
+  <p class="hero-sub">{{ editions|length }} édition{% if editions|length > 1 %}s{% endif %} disponible{% if editions|length > 1 %}s{% endif %}</p>
+</div>
+
+<!-- MAIN -->
+<main class="main">
+
+  <div class="section-header">
+    <div class="section-bar"></div>
+    <span class="section-title">Toutes les éditions</span>
+    <span class="section-count">{{ editions|length }} au total</span>
+  </div>
+
+  {% if editions %}
+  <div class="editions-grid">
+    {% for e in editions %}
+    <a href="{{ e.url }}" class="edition-card">
+      <div class="edition-card-num">
+        <span class="num-label">N°{{ e.number_padded }}</span>
+        <span class="num-arrow">→</span>
+      </div>
+      <div class="edition-card-line"></div>
+      <div class="edition-card-body">
+        <span class="edition-revue">Revue Huginn</span>
+        <span class="edition-date">{{ e.date_label }}</span>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty">
+    <p>Aucune édition publiée pour le moment.</p>
+    <p>La première édition apparaîtra ici après le prochain envoi automatique.</p>
+  </div>
+  {% endif %}
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <img class="footer-logo" src="{{ gh_pages_url }}/assets/arquus-logo-white.png" alt="ARQUUS">
+    <div class="footer-sep"></div>
+    <p class="footer-text">Dans la mythologie nordique, Huginn est l'un des deux corbeaux d'Odin. Il parcourt chaque jour les neuf mondes pour lui rapporter ce qu'il voit. Cet agent veille pour ARQUUS — filtre, trie, et délivre chaque semaine l'essentiel de la défense terrestre mondiale.</p>
+    <div class="footer-legal">
+      Revue Huginn<br>Veille interne ARQUUS
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
   /* ===== HEADER ===== */
   .header {
     background: #D9E8D6;
