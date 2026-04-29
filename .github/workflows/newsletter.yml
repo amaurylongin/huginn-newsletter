@@ -48,6 +48,7 @@ jobs:
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
           RECIPIENTS: ${{ secrets.RECIPIENTS }}
           GH_PAGES_URL: ${{ vars.GH_PAGES_URL }}
+          GH_MODE : ${{ vars.GH_MODE }}
         run: python src/main.py
 
       - name: Commit de l'archive sur le repo
