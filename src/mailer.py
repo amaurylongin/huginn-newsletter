@@ -1,83 +1,68 @@
-"""Envoi de la revue via l'API Brevo — contacts récupérés depuis la liste Brevo."""
+"""Envoi de la revue via le SDK officiel Brevo."""
 import os
-import json
-import urllib.request
-import ssl
+import sib_api_v3_sdk
+from sib_api_v3_sdk.rest import ApiException
 
 
-BREVO_API_URL = "https://api.brevo.com/v3"
+def _get_client():
+    """Configure et retourne le client Brevo."""
+    api_key = os.environ.get("BREVO_API_KEY", "")
+    if not api_key:
+        raise RuntimeError("BREVO_API_KEY manquant dans les secrets GitHub.")
+    configuration = sib_api_v3_sdk.Configuration()
+    configuration.api_key["api-key"] = api_key
+    return sib_api_v3_sdk.ApiClient(configuration)
 
 
-def _brevo_request(endpoint, method="GET", data=None):
-    """Appel générique à l'API Brevo."""
-    api_key = os.environ["BREVO_API_KEY"]
-    url = f"{BREVO_API_URL}/{endpoint}"
-
-    headers = {
-        "api-key": api_key,
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-    }
-
-    body = json.dumps(data).encode("utf-8") if data else None
-    req = urllib.request.Request(url, data=body, headers=headers, method=method)
-
-    ctx = ssl.create_default_context()
-    with urllib.request.urlopen(req, context=ctx, timeout=30) as resp:
-        raw = resp.read().decode("utf-8")
-        return json.loads(raw) if raw.strip() else {}
-
-
-def _fetch_recipients_from_brevo():
+def _fetch_recipients_from_brevo(client):
     """Récupère tous les emails de la liste Brevo configurée."""
     list_id = os.environ.get("BREVO_LIST_ID", "")
     if not list_id:
-        raise RuntimeError("BREVO_LIST_ID manquant dans les variables d'environnement.")
+        raise RuntimeError("BREVO_LIST_ID manquant dans les secrets GitHub.")
 
+    api = sib_api_v3_sdk.ContactsApi(client)
     recipients = []
     offset = 0
-    limit = 50  # max par page sur Brevo
+    limit = 50
 
     while True:
-        result = _brevo_request(
-            f"contacts/lists/{list_id}/contacts?limit={limit}&offset={offset}"
+        result = api.get_contacts_from_list(
+            int(list_id),
+            limit=limit,
+            offset=offset
         )
-        contacts = result.get("contacts", [])
+        contacts = result.contacts or []
         if not contacts:
             break
 
         for contact in contacts:
-            email = contact.get("email", "").strip()
+            email = (contact.get("email") or "").strip()
             if email:
-                recipients.append({
-                    "email": email,
-                    "name": contact.get("attributes", {}).get("PRENOM", ""),
-                })
+                fname = (contact.get("attributes") or {}).get("PRENOM", "")
+                recipients.append(
+                    sib_api_v3_sdk.SendSmtpEmailTo(
+                        email=email,
+                        name=fname if fname else None
+                    )
+                )
 
         offset += limit
-        if offset >= result.get("count", 0):
+        if offset >= (result.count or 0):
             break
 
     return recipients
 
 
 def send_newsletter(recipients_unused, html_body, issue_number, start_date, end_date):
-    """Envoie la revue via l'API Brevo à tous les contacts de la liste.
-
-    Le paramètre recipients_unused est ignoré — les destinataires sont
-    récupérés directement depuis la liste Brevo.
-    """
-    sender_email = os.environ.get("SMTP_USER", os.environ.get("BREVO_SENDER", ""))
-    sender_name = "HUGINN · Veille ARQUUS"
-
+    """Envoie la revue via l'API Brevo à tous les contacts de la liste."""
+    sender_email = os.environ.get("SMTP_USER", "")
     if not sender_email:
-        raise RuntimeError(
-            "Aucune adresse d'envoi configurée. "
-            "Définir SMTP_USER ou BREVO_SENDER dans les secrets GitHub."
-        )
+        raise RuntimeError("SMTP_USER manquant — adresse d'envoi non définie.")
 
-    # Récupérer les contacts depuis Brevo
-    brevo_recipients = _fetch_recipients_from_brevo()
+    client = _get_client()
+
+    # Récupérer les contacts depuis la liste Brevo
+    brevo_recipients = _fetch_recipients_from_brevo(client)
 
     if not brevo_recipients:
         print("⚠ Aucun contact dans la liste Brevo. Arrêt de l'envoi.")
@@ -91,26 +76,26 @@ def send_newsletter(recipients_unused, html_body, issue_number, start_date, end_
     )
 
     # Envoi via l'API transactionnelle Brevo
-    payload = {
-        "sender": {
-            "name": sender_name,
-            "email": sender_email,
-        },
-        "to": brevo_recipients,
-        "subject": subject,
-        "htmlContent": html_body,
-        "replyTo": {
-            "email": sender_email,
-            "name": sender_name,
-        },
-    }
+    api = sib_api_v3_sdk.TransactionalEmailsApi(client)
+
+    email = sib_api_v3_sdk.SendSmtpEmail(
+        sender=sib_api_v3_sdk.SendSmtpEmailSender(
+            name="HUGINN · Veille ARQUUS",
+            email=sender_email
+        ),
+        to=brevo_recipients,
+        subject=subject,
+        html_content=html_body,
+        reply_to=sib_api_v3_sdk.SendSmtpEmailReplyTo(
+            email=sender_email,
+            name="HUGINN · Veille ARQUUS"
+        )
+    )
 
     try:
-        result = _brevo_request("smtp/email", method="POST", data=payload)
-        message_id = result.get("messageId", "inconnu")
+        result = api.send_transac_email(email)
         print(f"✓ Mail envoyé via Brevo à {len(brevo_recipients)} destinataire(s)")
-        print(f"  → Message ID : {message_id}")
-    except urllib.error.HTTPError as e:
-        error_body = e.read().decode("utf-8", errors="ignore")
-        print(f"❌ Erreur Brevo ({e.code}) : {error_body}")
+        print(f"  → Message ID : {result.message_id}")
+    except ApiException as e:
+        print(f"❌ Erreur Brevo ({e.status}) : {e.body}")
         raise
