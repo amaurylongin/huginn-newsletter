@@ -1,8 +1,166 @@
 # 🐦‍⬛ HUGINN — Bot de veille technologique ARQUUS
 
-Bot OSINT automatisé qui collecte chaque semaine les actualités pertinentes de défense terrestre depuis des flux RSS, les filtre via IA, et les diffuse par mail à une liste de destinataires sous forme de revue visuelle. S'exécute automatiquement via cron-job.org + GitHub Actions — ordi éteint, aucune action requise.
+Bot OSINT automatisé qui collecte chaque semaine les actualités pertinentes de défense terrestre depuis des flux RSS, les filtre via IA, et les diffuse par mail à une liste de destinataires sous forme de revue visuelle. S'exécute automatiquement — ordi éteint, aucune action requise.
 
 ---
+
+# 📖 PARTIE 1 — Utilisation au quotidien
+
+Cette partie regroupe toutes les actions courantes qu'on peut faire sur le bot une fois qu'il est en place.
+
+## 👥 Gérer les destinataires
+
+Les destinataires sont stockés dans un secret GitHub pour ne pas exposer les adresses publiquement.
+
+**Pour ajouter ou retirer un destinataire :**
+1. Aller dans le repo GitHub → **Settings → Secrets and variables → Actions**
+2. Onglet **"Secrets"** → trouver `RECIPIENTS` → cliquer ✏️ **Update**
+3. Coller la nouvelle liste, **séparée par des virgules sans espaces** :
+   ```
+   prenom.nom@arquus-defense.com,collegue1@arquus-defense.com,collegue2@arquus-defense.com
+   ```
+4. **Update secret**
+
+> Le changement est pris en compte au prochain envoi. Pas besoin de toucher au code.
+
+---
+
+## 📰 Modifier les sources RSS suivies
+
+**Pour ajouter ou retirer une source :**
+1. Aller dans `config/sources.txt` sur GitHub
+2. Cliquer ✏️ pour éditer
+3. **Une URL par ligne**. Les lignes commençant par `#` sont des commentaires (ignorées).
+4. Commit
+
+**Exemple de fichier :**
+```
+# Sources principales
+https://breakingdefense.com/feed/
+https://militaryleak.com/feed/
+https://army-technology.com/feed/
+
+# Sources Ukraine
+https://kyivindependent.com/tag/war/feed/
+
+# Source désactivée temporairement
+# https://defensenews.com/arc/outboundfeeds/rss/
+```
+
+> Pour vérifier qu'un flux RSS fonctionne, copier l'URL dans un navigateur — si du XML s'affiche, c'est bon.
+
+---
+
+## 🎯 Ajuster les critères de filtrage (thèmes, mots-clés)
+
+C'est ce qui définit quels articles sont retenus par l'IA. Le fichier `config/criteria.md` contient :
+- Les **domaines à inclure** (mots-clés positifs)
+- Les **domaines à exclure** absolument
+- Le **contexte ARQUUS** que l'IA utilise pour juger la pertinence
+
+**Pour modifier :**
+1. Aller dans `config/criteria.md` sur GitHub
+2. Cliquer ✏️ pour éditer
+3. Ajouter ou retirer des mots-clés dans les sections existantes (ou créer de nouvelles sections)
+4. Commit
+
+**Exemples concrets :**
+
+*Ajouter un nouveau thème* :
+```markdown
+### Robotique militaire avancée
+Robot terrestre, robot tactique, robot de combat, swarm robotics, 
+intelligence artificielle militaire, autonomie de niveau 4.
+```
+
+*Exclure un sujet* :
+```markdown
+- **Drones de surveillance civile** : drones agricoles, drones de loisirs
+```
+
+> Plus les mots-clés sont précis et nombreux, meilleur sera le filtrage.
+
+---
+
+## ⏰ Modifier le jour ou l'heure d'envoi
+
+Le bot est déclenché par un service externe **cron-job.org** (compte gratuit).
+
+1. Aller sur **https://cron-job.org** et se connecter
+2. Trouver le job `HUGINN` → cliquer dessus
+3. Onglet **"Schedule"** → modifier le jour et l'heure
+4. **Save**
+
+> ⚠️ Les heures sur cron-job.org sont en **UTC**.
+> - Paris en été = UTC+2 → soustraire 2h. Exemple : lundi 8h Paris → lundi 6h UTC
+> - Paris en hiver = UTC+1 → soustraire 1h. Exemple : lundi 8h Paris → lundi 7h UTC
+
+---
+
+## ▶️ Déclencher un envoi manuel
+
+Pour envoyer la revue immédiatement (test, vérification, rattrapage) :
+
+1. Aller dans **Actions → Revue Huginn — envoi hebdomadaire**
+2. Bouton **Run workflow** (à droite) → confirmer **Run workflow**
+3. Patienter 2-3 min, le mail arrive après
+
+---
+
+## 🗑️ Gérer les éditions archivées
+
+Le numéro d'édition est calculé automatiquement à partir du nombre de fichiers présents dans `docs/editions/`.
+
+### Réinitialiser le compteur (exemple : repartir à N°3)
+
+1. Aller dans `docs/editions/` sur GitHub
+2. Identifier les **deux éditions à conserver** (futures N°1 et N°2)
+3. Supprimer toutes les autres :
+   - Le plus rapide : utiliser **GitHub Desktop** pour tout supprimer en local et pousser en un seul commit
+   - Sinon : ouvrir chaque fichier sur GitHub → 🗑️ → commit
+4. Renommer les deux éditions conservées :
+   - La plus ancienne → `YYYY-MM-DD-edition-001.html`
+   - La seconde → `YYYY-MM-DD-edition-002.html`
+5. Supprimer `docs/index.html` (sera régénéré)
+6. **Actions → Run workflow** → la prochaine édition sera **N°003**
+
+### Tout réinitialiser
+
+1. Supprimer tout le contenu de `docs/editions/`
+2. Supprimer `docs/index.html`
+3. La prochaine édition sera **N°001**
+
+---
+
+## 📧 Changer l'adresse mail d'envoi
+
+1. **Settings → Secrets and variables → Actions → Secrets**
+2. Modifier les secrets concernés :
+   - `SMTP_USER` : nouvelle adresse mail
+   - `SMTP_PASSWORD` : mot de passe d'application correspondant
+   - `SMTP_HOST` : `smtp.gmail.com` (Gmail) ou `smtp.office365.com` (Outlook entreprise)
+
+> Pour Outlook entreprise, demander à l'IT le serveur SMTP autorisé et générer un mot de passe d'application via le portail Microsoft 365.
+
+---
+
+## 🛟 Dépannage rapide
+
+| Problème | Solution |
+|---|---|
+| Aucun mail reçu cette semaine | Vérifier dans **Actions** que le workflow s'est bien lancé. Si pas de run, vérifier cron-job.org. |
+| Couleurs cassées dans Outlook | Outlook en mode sombre. Fichier → Options → Général → cocher "Ne jamais modifier la couleur des messages" |
+| Images non affichées dans le mail | Ajouter l'expéditeur aux contacts du destinataire (Outlook le fait automatiquement après le 1er mail) |
+| Tous les articles d'une seule source | Les autres flux RSS sont peut-être cassés. Vérifier les logs du dernier run dans Actions. |
+| "Quota exceeded" Gemini | Trop de tests manuels dans la journée. Attendre la réinitialisation à minuit Pacific (~9h Paris). |
+| Page d'archive cassée | Supprimer `docs/index.html` et relancer le workflow |
+| Mode sombre Outlook modifie les couleurs | Fichier → Options → Général → cocher "Ne jamais modifier la couleur des messages" |
+
+---
+
+# 🛠️ PARTIE 2 — Installation & déploiement
+
+Cette partie est à suivre **une seule fois**, lors du premier déploiement du bot.
 
 ## 🗂 Structure du projet
 
@@ -20,9 +178,9 @@ huginn-newsletter/
 │   ├── newsletter.html                 # Template du mail
 │   └── archive_index.html              # Page d'archive web
 ├── config/
-│   ├── sources.txt                     # 👉 Flux RSS suivis
-│   ├── recipients.txt                  # (vide — voir secret RECIPIENTS)
-│   └── criteria.md                     # 👉 Critères de filtrage ARQUUS
+│   ├── sources.txt                     # Flux RSS suivis
+│   ├── recipients.txt                  # (vide — destinataires dans le secret)
+│   └── criteria.md                     # Critères de filtrage ARQUUS
 ├── docs/
 │   ├── index.html                      # Page d'archive (auto-générée)
 │   ├── editions/                       # Éditions archivées
@@ -30,8 +188,6 @@ huginn-newsletter/
 ├── requirements.txt
 └── README.md
 ```
-
----
 
 ## ⚙️ Architecture
 
@@ -52,7 +208,7 @@ cron-job.org ──► GitHub Actions ──► RSS sources
 
 ### Étape 1 — Cloner le repo
 
-Utiliser GitHub Desktop (File → Clone repository) ou en ligne de commande :
+Utiliser **GitHub Desktop** (File → Clone repository) ou en ligne de commande :
 
 ```bash
 git clone https://github.com/votre-username/huginn-newsletter.git
@@ -136,86 +292,13 @@ GitHub Actions est peu fiable pour les crons sur les repos peu actifs. On utilis
 
 ---
 
-## ⚙️ Personnalisation courante
+## 📜 Notes techniques
 
-### Ajouter / retirer un flux RSS
-
-Éditer `config/sources.txt` (une URL par ligne, `#` pour commenter).
-
-### Ajouter / retirer un destinataire
-
-Mettre à jour le secret `RECIPIENTS` dans GitHub.
-Format : `prenom.nom@exemple.fr,contact@exemple.fr,autre@exemple.fr`
-
-### Modifier le jour / l'heure d'envoi
-
-Modifier le planning sur **cron-job.org** (heures en UTC).
-
-> Paris = UTC+2 en été (mars→octobre), UTC+1 en hiver (octobre→mars).
-> Exemple : lundi 08h00 Paris en été = lundi **06h00 UTC**.
-
-### Ajuster les critères de filtrage
-
-Éditer `config/criteria.md` — ajouter/retirer des mots-clés, affiner les exclusions, modifier le contexte ARQUUS.
-
-### Déclencher manuellement
-
-**Actions → Revue Huginn → Run workflow → Run workflow**.
-
----
-
-## 🗑️ Gérer les éditions archivées
-
-### Supprimer d'anciennes éditions et réinitialiser le compteur
-
-Le numéro d'édition est calculé automatiquement par `archiver.py` : il compte les fichiers présents dans `docs/editions/` et ajoute 1. Donc pour repartir à un numéro précis, il suffit de garder le bon nombre de fichiers.
-
-**Exemple — repartir à l'édition N°3** :
-
-1. Aller dans `docs/editions/` sur GitHub
-2. Identifier les **deux éditions à conserver** (futures N°1 et N°2)
-3. Supprimer toutes les autres éditions :
-   - Le plus rapide : utiliser **GitHub Desktop** pour tout supprimer en local et pousser en un seul commit
-   - Sinon en ligne : ouvrir chaque fichier → 🗑️ → commit
-4. Renommer les deux éditions conservées :
-   - La plus ancienne → `YYYY-MM-DD-edition-001.html`
-   - La seconde → `YYYY-MM-DD-edition-002.html`
-5. Supprimer `docs/index.html` (sera régénéré au prochain run)
-6. **Actions → Run workflow** → la prochaine édition sera **N°003**
-
-### Tout réinitialiser
-
-1. Supprimer tout le contenu du dossier `docs/editions/`
-2. Supprimer `docs/index.html`
-3. La prochaine édition sera **N°001**
-
----
-
-## 🛟 Dépannage
-
-| Problème | Cause probable | Solution |
-|---|---|---|
-| Workflow ne se déclenche pas | GitHub Actions peu fiable sur crons | Utiliser cron-job.org (étape 8) |
-| "SMTP authentication failed" | Mot de passe d'application invalide | Regénérer un mot de passe |
-| "GEMINI_API_KEY not set" | Secret absent ou mal nommé | Vérifier l'étape 4 |
-| "Quota exceeded" Gemini | Trop de tests dans la journée | Attendre la réinitialisation à minuit Pacific (~9h Paris) |
-| Moins de 2 articles retenus | Semaine creuse ou critères trop stricts | Assouplir `config/criteria.md` |
-| Tous les articles d'une seule source | Autres flux RSS bloquent les requêtes | Mettre à jour `config/sources.txt` |
-| Logos absents | Fichiers manquants dans `docs/assets/` | Vérifier l'étape 6 |
-| GitHub Pages 404 | Pages non activé | Vérifier l'étape 5 |
-| Page d'archive cassée (HTML dupliqué) | Mauvais collage dans le template | Supprimer `docs/index.html`, vérifier que `templates/archive_index.html` ne contient qu'une seule fois `<!DOCTYPE html>` |
-| Couleurs incorrectes dans Outlook | Mode sombre Outlook actif | Fichier → Options → Général → cocher "Ne jamais modifier la couleur des messages" |
-| Images non affichées dans le mail | Sécurité du client mail | Ajouter l'expéditeur aux contacts pour téléchargement automatique |
-
----
-
-## 📜 Notes
-
-- Le filtrage est réalisé par IA — des faux positifs/négatifs sont possibles.
-- Les boutons 👍 / ✉ Contactez-nous permettent de remonter du feedback.
-- L'API Gemini est utilisée sur le tier gratuit (1 requête par run = largement suffisant).
-- GitHub Actions offre 2 000 minutes/mois gratuites — largement suffisant.
-- Toutes les archives sont disponibles indéfiniment via GitHub Pages.
+- Le filtrage est réalisé par IA Gemini (modèle `gemini-3.1-flash-lite-preview` en principal)
+- L'API Gemini est utilisée sur le tier gratuit (1 requête par run = largement suffisant)
+- GitHub Actions offre 2 000 minutes/mois gratuites — largement suffisant
+- Toutes les archives sont disponibles indéfiniment via GitHub Pages
+- Les boutons 👍 / ✉ Contactez-nous dans le mail permettent de remonter du feedback
 
 ---
 
