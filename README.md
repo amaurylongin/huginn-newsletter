@@ -17,7 +17,7 @@ Les destinataires sont stockés dans un secret GitHub pour ne pas exposer les ad
 2. Onglet **"Secrets"** → trouver `RECIPIENTS` → cliquer ✏️ **Update**
 3. Coller la nouvelle liste, **séparée par des virgules sans espaces** :
    ```
-   prenom.nom@arquus-defense.com,collegue1@arquus-defense.com,collegue2@arquus-defense.com
+   prenom.nom@entreprise.com,collegue1@entreprise.com,collegue2@entreprise.com
    ```
 4. **Update secret**
 
