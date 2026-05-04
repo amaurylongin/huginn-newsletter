@@ -1,12 +1,4 @@
-"""HUGINN — point d'entrée principal.
-
-Deux modes disponibles, contrôlés par la variable GH_MODE :
-  - GH_MODE=rss    (défaut) : collecte via flux RSS dans config/sources.txt
-  - GH_MODE=search : Gemini cherche lui-même sur le web dans toutes les langues
-
-Pour basculer en mode search :
-  GitHub → Settings → Variables → Ajouter GH_MODE = search
-"""
+"""HUGINN — point d'entrée principal."""
 import sys
 import os
 from pathlib import Path
@@ -30,10 +22,16 @@ def main():
     print("=" * 60)
 
     criteria       = (PROJECT_ROOT / "config" / "criteria.md").read_text(encoding="utf-8")
+    recipients_env = os.environ.get("RECIPIENTS", "")
+    recipients     = [r.strip() for r in recipients_env.split(",") if r.strip()]
     mode           = os.environ.get("GH_MODE", "rss").strip().lower()
 
     print(f"\n▸ Mode : {mode.upper()}")
-    print(f"▸ Destinataires : gérés par Brevo")
+    print(f"▸ {len(recipients)} destinataire(s)")
+
+    if not recipients:
+        print("❌ Aucun destinataire. Arrêt.")
+        sys.exit(1)
 
     end_date   = datetime.now(timezone.utc)
     start_date = end_date - timedelta(days=7)
@@ -68,20 +66,20 @@ def main():
         articles = search_articles(criteria, start_date, end_date)
 
     else:
-        print(f"❌ Mode inconnu : '{mode}'. Utilisez 'rss' ou 'search'.")
+        print(f"❌ Mode inconnu : '{mode}'.")
         sys.exit(1)
 
     # ── SUITE COMMUNE ─────────────────────────────────────────
     print(f"\n▸ {len(articles)} article(s) retenu(s)")
 
     if len(articles) < 2:
-        print("ℹ Moins de 2 articles. Newsletter non envoyée.")
+        print("ℹ Moins de 2 articles. Revue non envoyée.")
         sys.exit(0)
 
     issue_number = get_next_issue_number()
     print(f"▸ Édition N°{issue_number:03d}")
 
-    print("\n▸ Rendu de la newsletter...")
+    print("\n▸ Rendu...")
     html = render_newsletter(
         articles=articles,
         synthesis="",
@@ -96,8 +94,8 @@ def main():
     save_to_archive(html, end_date, issue_number)
     update_archive_index()
 
-    print("\n▸ Envoi via Brevo...")
-    send_newsletter([], html, issue_number, start_date, end_date)
+    print(f"\n▸ Envoi à {len(recipients)} destinataire(s)...")
+    send_newsletter(recipients, html, issue_number, start_date, end_date)
 
     print("\n" + "=" * 60)
     print(f"✓ HUGINN N°{issue_number:03d} diffusée ({mode.upper()} mode).")
