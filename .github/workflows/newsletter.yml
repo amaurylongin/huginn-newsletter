@@ -45,9 +45,9 @@ jobs:
       - name: Exécution de HUGINN
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
-          BREVO_LIST_ID: ${{ secrets.BREVO_LIST_ID }}
           SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          RECIPIENTS: ${{ secrets.RECIPIENTS }}
           GH_PAGES_URL: ${{ vars.GH_PAGES_URL }}
           GH_MODE: ${{ vars.GH_MODE }}
         run: python src/main.py
